@@ -23,10 +23,15 @@ export const PAGINATION = {
   MAX_PAGE_SIZE: 50,
 } as const;
 
-export const ADMIN_EMAILS =
-  process.env.NEXT_PUBLIC_ADMIN_EMAILS?.split(",") || [];
-
 export const SORT_OPTIONS = [
   { value: "votes", label: "Most Upvoted" },
   { value: "createdAt", label: "Newest First" },
 ] as const;
+
+// Firestore collection names
+export const COLLECTIONS = {
+  USERS: "users",
+  FEATURE_REQUESTS: "featureRequests",
+  COMMENTS: "comments",
+  ADMIN_EMAILS: "adminEmails",
+} as const;

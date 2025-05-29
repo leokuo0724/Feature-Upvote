@@ -1,10 +1,3 @@
-import { ADMIN_EMAILS } from "@/shared/config";
-
-export function isAdmin(email: string | null): boolean {
-  if (!email) return false;
-  return ADMIN_EMAILS.includes(email);
-}
-
 export function formatCount(count: number): string {
   if (count < 1000) return count.toString();
   if (count < 1000000) return `${(count / 1000).toFixed(1)}k`;
