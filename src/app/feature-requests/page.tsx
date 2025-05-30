@@ -215,15 +215,13 @@ export default function FeatureRequestsPage() {
                 <div className="space-y-6">
                   {/* Feature Requests Grid */}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {featureRequests
-                      .filter((fr) => fr.status === tab.value)
-                      .map((featureRequest) => (
-                        <FeatureRequestCard
-                          key={featureRequest.id}
-                          featureRequest={featureRequest}
-                          onClick={handleFeatureRequestClick}
-                        />
-                      ))}
+                    {featureRequests.map((featureRequest) => (
+                      <FeatureRequestCard
+                        key={featureRequest.id}
+                        featureRequest={featureRequest}
+                        onClick={handleFeatureRequestClick}
+                      />
+                    ))}
                   </div>
 
                   {/* Load More Button */}

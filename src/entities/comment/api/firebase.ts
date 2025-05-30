@@ -14,6 +14,7 @@ import {
   serverTimestamp,
   QueryDocumentSnapshot,
   DocumentData,
+  Timestamp,
 } from "firebase/firestore";
 import { db } from "@/shared/config/firebase";
 import { COLLECTIONS } from "@/shared/config/constants";
@@ -23,6 +24,34 @@ import {
   UpdateCommentData,
   CommentsQuery,
 } from "@/shared/types";
+
+// Helper function to convert Firestore document data to Comment
+function convertFirestoreCommentDoc(
+  doc: QueryDocumentSnapshot<DocumentData> | DocumentData,
+  id?: string
+): Comment {
+  const data = "data" in doc ? doc.data() : doc;
+  const docId = id || ("id" in doc ? doc.id : "");
+
+  return {
+    id: docId,
+    content: data.content || "",
+    featureRequestId: data.featureRequestId || "",
+    authorId: data.authorId || "",
+    authorName: data.authorName || "",
+    authorEmail: data.authorEmail || "",
+    authorPhotoURL: data.authorPhotoURL || "",
+    // Convert Firestore Timestamps to Date objects
+    createdAt:
+      data.createdAt instanceof Timestamp
+        ? data.createdAt.toDate()
+        : new Date(data.createdAt || Date.now()),
+    updatedAt:
+      data.updatedAt instanceof Timestamp
+        ? data.updatedAt.toDate()
+        : new Date(data.updatedAt || Date.now()),
+  };
+}
 
 // Create a new comment
 export async function createComment(
@@ -53,10 +82,7 @@ export async function getComment(id: string): Promise<Comment | null> {
   const commentSnap = await getDoc(commentRef);
 
   if (commentSnap.exists()) {
-    return {
-      id: commentSnap.id,
-      ...commentSnap.data(),
-    } as Comment;
+    return convertFirestoreCommentDoc(commentSnap);
   }
   return null;
 }
@@ -98,10 +124,7 @@ export async function getComments(queryParams: CommentsQuery): Promise<{
 
   const comments: Comment[] = [];
   querySnapshot.forEach((doc) => {
-    comments.push({
-      id: doc.id,
-      ...doc.data(),
-    } as Comment);
+    comments.push(convertFirestoreCommentDoc(doc));
   });
 
   const hasMore = querySnapshot.docs.length === queryLimit;
@@ -141,10 +164,7 @@ export async function getCommentsWithCursor(
 
   const comments: Comment[] = [];
   querySnapshot.forEach((doc) => {
-    comments.push({
-      id: doc.id,
-      ...doc.data(),
-    } as Comment);
+    comments.push(convertFirestoreCommentDoc(doc));
   });
 
   const hasMore = querySnapshot.docs.length === queryLimit;

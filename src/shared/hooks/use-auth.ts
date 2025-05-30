@@ -49,7 +49,8 @@ export function useAuth() {
     );
 
     return () => unsubscribe();
-  }, [createUserMutation]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty dependency array - auth state change only happens on login/logout
 
   // Sign in with Google
   const signIn = async () => {

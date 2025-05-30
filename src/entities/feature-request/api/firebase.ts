@@ -19,6 +19,7 @@ import {
   DocumentData,
   Query,
   CollectionReference,
+  Timestamp,
 } from "firebase/firestore";
 import { db } from "@/shared/config/firebase";
 import { COLLECTIONS } from "@/shared/config/constants";
@@ -30,6 +31,38 @@ import {
   FeatureRequestFilters,
   FeatureRequestSort,
 } from "@/shared/types";
+
+// Helper function to convert Firestore document data to FeatureRequest
+function convertFirestoreDoc(
+  doc: QueryDocumentSnapshot<DocumentData> | DocumentData,
+  id?: string
+): FeatureRequest {
+  const data = "data" in doc ? doc.data() : doc;
+  const docId = id || ("id" in doc ? doc.id : "");
+
+  return {
+    id: docId,
+    title: data.title || "",
+    description: data.description || "",
+    status: data.status || "Open",
+    upvotes: data.upvotes || 0,
+    upvotedBy: data.upvotedBy || [],
+    labels: data.labels || [],
+    authorId: data.authorId || "",
+    authorName: data.authorName || "",
+    authorEmail: data.authorEmail || "",
+    commentsCount: data.commentsCount || 0,
+    // Convert Firestore Timestamps to Date objects
+    createdAt:
+      data.createdAt instanceof Timestamp
+        ? data.createdAt.toDate()
+        : new Date(data.createdAt || Date.now()),
+    updatedAt:
+      data.updatedAt instanceof Timestamp
+        ? data.updatedAt.toDate()
+        : new Date(data.updatedAt || Date.now()),
+  };
+}
 
 // Create a new feature request
 export async function createFeatureRequest(
@@ -65,10 +98,7 @@ export async function getFeatureRequest(
   const featureRequestSnap = await getDoc(featureRequestRef);
 
   if (featureRequestSnap.exists()) {
-    return {
-      id: featureRequestSnap.id,
-      ...featureRequestSnap.data(),
-    } as FeatureRequest;
+    return convertFirestoreDoc(featureRequestSnap);
   }
   return null;
 }
@@ -131,6 +161,7 @@ export async function toggleUpvote(
 // Build Firestore query based on filters and sorting
 function buildQuery(queryParams: FeatureRequestsQuery): Query<DocumentData> {
   const { filters, sort, limit: queryLimit } = queryParams;
+
   const collectionRef = collection(db, COLLECTIONS.FEATURE_REQUESTS);
   let q: Query<DocumentData> = collectionRef;
 
@@ -172,10 +203,7 @@ export async function getFeatureRequests(
 
   const featureRequests: FeatureRequest[] = [];
   querySnapshot.forEach((doc) => {
-    featureRequests.push({
-      id: doc.id,
-      ...doc.data(),
-    } as FeatureRequest);
+    featureRequests.push(convertFirestoreDoc(doc));
   });
 
   const hasMore = querySnapshot.docs.length === (queryParams.limit || 10);
@@ -197,31 +225,34 @@ export async function getFeatureRequestsWithCursor(
   hasMore: boolean;
   lastDoc?: QueryDocumentSnapshot<DocumentData>;
 }> {
-  let q = buildQuery(queryParams);
+  try {
+    let q = buildQuery(queryParams);
 
-  // Add cursor for pagination
-  if (lastDoc) {
-    q = query(q, startAfter(lastDoc));
+    // Add cursor for pagination
+    if (lastDoc) {
+      q = query(q, startAfter(lastDoc));
+    }
+
+    const querySnapshot = await getDocs(q);
+
+    const featureRequests: FeatureRequest[] = [];
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      featureRequests.push(convertFirestoreDoc(data, doc.id));
+    });
+
+    const hasMore = querySnapshot.docs.length === (queryParams.limit || 10);
+    const newLastDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
+
+    return {
+      featureRequests,
+      hasMore,
+      lastDoc: newLastDoc,
+    };
+  } catch (error) {
+    console.error("Error in getFeatureRequestsWithCursor:", error);
+    throw error;
   }
-
-  const querySnapshot = await getDocs(q);
-
-  const featureRequests: FeatureRequest[] = [];
-  querySnapshot.forEach((doc) => {
-    featureRequests.push({
-      id: doc.id,
-      ...doc.data(),
-    } as FeatureRequest);
-  });
-
-  const hasMore = querySnapshot.docs.length === (queryParams.limit || 10);
-  const newLastDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
-
-  return {
-    featureRequests,
-    hasMore,
-    lastDoc: newLastDoc,
-  };
 }
 
 // Search feature requests by title and description
@@ -249,10 +280,7 @@ export async function searchFeatureRequests(
       data.title.toLowerCase().includes(searchLower) ||
       data.description.toLowerCase().includes(searchLower)
     ) {
-      featureRequests.push({
-        id: docSnapshot.id,
-        ...data,
-      } as FeatureRequest);
+      featureRequests.push(convertFirestoreDoc(docSnapshot));
     }
   });
 

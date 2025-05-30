@@ -1,0 +1,117 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "featureRequests",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "featureRequests",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "featureRequests",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "upvotes",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "featureRequests",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "upvotes",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "featureRequests",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "labels",
+          "arrayConfig": "CONTAINS"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "featureRequests",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "labels",
+          "arrayConfig": "CONTAINS"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "featureRequests",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "labels",
+          "arrayConfig": "CONTAINS"
+        },
+        {
+          "fieldPath": "upvotes",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "featureRequests",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "labels",
+          "arrayConfig": "CONTAINS"
+        },
+        {
+          "fieldPath": "upvotes",
+          "order": "ASCENDING"
+        }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

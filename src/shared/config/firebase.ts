@@ -11,6 +11,26 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
+// Check for missing required fields
+const requiredFields = [
+  "apiKey",
+  "authDomain",
+  "projectId",
+  "storageBucket",
+  "messagingSenderId",
+  "appId",
+];
+const missingFields = requiredFields.filter(
+  (field) => !firebaseConfig[field as keyof typeof firebaseConfig]
+);
+
+if (missingFields.length > 0) {
+  console.error("Missing Firebase configuration fields:", missingFields);
+  throw new Error(
+    `Missing Firebase configuration: ${missingFields.join(", ")}`
+  );
+}
+
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
