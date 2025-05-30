@@ -1,0 +1,309 @@
+"use client";
+
+import React, { useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { formatDistanceToNow } from "date-fns";
+import {
+  ChevronUp,
+  ArrowLeft,
+  Edit,
+  Trash2,
+  MoreHorizontal,
+  User,
+  Calendar,
+  Tag,
+} from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Badge,
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/shared/ui";
+import { useAuth } from "@/shared/hooks/use-auth";
+import {
+  useFeatureRequest,
+  useToggleUpvote,
+  useDeleteFeatureRequest,
+} from "@/entities/feature-request";
+import { CommentList } from "@/widgets/comment-list";
+import { CreateFeatureRequestForm } from "@/features/create-feature-request";
+import { formatCount } from "@/shared/lib/utils";
+
+const statusColors = {
+  Open: "default",
+  "In Progress": "info",
+  Completed: "success",
+  "Won't Do": "destructive",
+  Pending: "warning",
+  "Under Discussion": "secondary",
+  "Will Do": "success",
+} as const;
+
+export default function FeatureRequestDetailPage() {
+  const params = useParams();
+  const router = useRouter();
+  const { user } = useAuth();
+  const [showEditForm, setShowEditForm] = useState(false);
+  const [isUpvoting, setIsUpvoting] = useState(false);
+
+  const featureRequestId = params.id as string;
+
+  const {
+    data: featureRequest,
+    isLoading,
+    error,
+  } = useFeatureRequest(featureRequestId);
+  const toggleUpvote = useToggleUpvote();
+  const deleteFeatureRequest = useDeleteFeatureRequest();
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto py-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="animate-pulse space-y-6">
+            <div className="h-8 bg-muted rounded w-1/4"></div>
+            <div className="h-32 bg-muted rounded"></div>
+            <div className="h-64 bg-muted rounded"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !featureRequest) {
+    return (
+      <div className="container mx-auto py-8">
+        <div className="max-w-4xl mx-auto text-center">
+          <h1 className="text-2xl font-bold mb-4">Feature Request Not Found</h1>
+          <p className="text-muted-foreground mb-6">
+            The feature request you're looking for doesn't exist or has been
+            removed.
+          </p>
+          <Button onClick={() => router.push("/feature-requests")}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Feature Requests
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  const hasUpvoted = user ? featureRequest.upvotedBy.includes(user.uid) : false;
+  const canEdit =
+    user && (user.isAdmin || user.uid === featureRequest.authorId);
+  const canDelete =
+    user && (user.isAdmin || user.uid === featureRequest.authorId);
+
+  const handleUpvote = async () => {
+    if (!user || isUpvoting) return;
+
+    setIsUpvoting(true);
+    try {
+      await toggleUpvote.mutateAsync({
+        featureRequestId: featureRequest.id,
+        userId: user.uid,
+      });
+    } finally {
+      setIsUpvoting(false);
+    }
+  };
+
+  const handleEdit = () => {
+    setShowEditForm(true);
+  };
+
+  const handleDelete = async () => {
+    if (!confirm("Are you sure you want to delete this feature request?")) {
+      return;
+    }
+
+    try {
+      await deleteFeatureRequest.mutateAsync(featureRequest.id);
+      router.push("/feature-requests");
+    } catch (error) {
+      console.error("Error deleting feature request:", error);
+    }
+  };
+
+  const handleEditSuccess = () => {
+    setShowEditForm(false);
+  };
+
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  return (
+    <div className="container mx-auto py-8">
+      <div className="max-w-4xl mx-auto space-y-6">
+        {/* Back Button */}
+        <Button
+          variant="ghost"
+          onClick={() => router.push("/feature-requests")}
+          className="mb-4"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Feature Requests
+        </Button>
+
+        {/* Main Content */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1 min-w-0">
+                <CardTitle className="text-2xl mb-3">
+                  {featureRequest.title}
+                </CardTitle>
+
+                <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
+                  <div className="flex items-center gap-1">
+                    <User className="h-4 w-4" />
+                    <span>by {featureRequest.authorName}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Calendar className="h-4 w-4" />
+                    <span>
+                      {formatDistanceToNow(featureRequest.createdAt, {
+                        addSuffix: true,
+                      })}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Badge
+                    variant={statusColors[featureRequest.status] || "default"}
+                  >
+                    {featureRequest.status}
+                  </Badge>
+
+                  {featureRequest.labels.map((label) => (
+                    <Badge key={label} variant="outline" className="text-xs">
+                      <Tag className="h-3 w-3 mr-1" />
+                      {label}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                {/* Upvote Button */}
+                <Button
+                  variant={hasUpvoted ? "default" : "outline"}
+                  size="sm"
+                  className="flex items-center gap-2"
+                  onClick={handleUpvote}
+                  disabled={isUpvoting || !user}
+                >
+                  <ChevronUp
+                    className={`h-4 w-4 ${hasUpvoted ? "fill-current" : ""}`}
+                  />
+                  <span>{formatCount(featureRequest.upvotes)}</span>
+                </Button>
+
+                {/* Actions Menu */}
+                {(canEdit || canDelete) && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      {canEdit && (
+                        <DropdownMenuItem onClick={handleEdit}>
+                          <Edit className="mr-2 h-4 w-4" />
+                          Edit
+                        </DropdownMenuItem>
+                      )}
+                      {canDelete && (
+                        <>
+                          {canEdit && <DropdownMenuSeparator />}
+                          <DropdownMenuItem
+                            onClick={handleDelete}
+                            className="text-destructive focus:text-destructive"
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete
+                          </DropdownMenuItem>
+                        </>
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
+              </div>
+            </div>
+          </CardHeader>
+
+          <CardContent>
+            <div className="prose prose-sm max-w-none">
+              <p className="text-foreground leading-relaxed whitespace-pre-wrap">
+                {featureRequest.description}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Author Info */}
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-3">
+              <Avatar className="h-10 w-10">
+                <AvatarImage src={undefined} />
+                <AvatarFallback>
+                  {getInitials(featureRequest.authorName)}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <p className="font-medium">{featureRequest.authorName}</p>
+                <p className="text-sm text-muted-foreground">
+                  Created{" "}
+                  {formatDistanceToNow(featureRequest.createdAt, {
+                    addSuffix: true,
+                  })}
+                  {featureRequest.updatedAt.getTime() !==
+                    featureRequest.createdAt.getTime() && (
+                    <span>
+                      {" • Updated "}
+                      {formatDistanceToNow(featureRequest.updatedAt, {
+                        addSuffix: true,
+                      })}
+                    </span>
+                  )}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Comments Section */}
+        <CommentList featureRequestId={featureRequest.id} />
+
+        {/* Edit Form Modal */}
+        {showEditForm && (
+          <CreateFeatureRequestForm
+            open={showEditForm}
+            onOpenChange={setShowEditForm}
+            onSuccess={handleEditSuccess}
+            // TODO: Add edit mode props to pass existing data
+          />
+        )}
+      </div>
+    </div>
+  );
+}

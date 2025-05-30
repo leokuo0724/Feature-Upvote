@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { onAuthStateChanged, User as FirebaseUser } from "firebase/auth";
+import {
+  onAuthStateChanged,
+  User as FirebaseUser,
+  signInWithPopup,
+  GoogleAuthProvider,
+  signOut as firebaseSignOut,
+} from "firebase/auth";
 import { auth } from "@/shared/config/firebase";
 import { User } from "@/shared/types";
 import { useIsAdmin, useCreateUser } from "@/entities/user/api/queries";
@@ -45,6 +51,27 @@ export function useAuth() {
     return () => unsubscribe();
   }, [createUserMutation]);
 
+  // Sign in with Google
+  const signIn = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+    } catch (error) {
+      console.error("Error signing in:", error);
+      throw error;
+    }
+  };
+
+  // Sign out
+  const signOut = async () => {
+    try {
+      await firebaseSignOut(auth);
+    } catch (error) {
+      console.error("Error signing out:", error);
+      throw error;
+    }
+  };
+
   // Construct the user object
   const user: User | null = firebaseUser
     ? {
@@ -58,5 +85,5 @@ export function useAuth() {
       }
     : null;
 
-  return { user, loading };
+  return { user, loading, signIn, signOut };
 }
