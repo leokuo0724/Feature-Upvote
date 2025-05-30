@@ -247,18 +247,50 @@ export function useToggleUpvote() {
   });
 }
 
+// Comment count management hooks
 export function useIncrementCommentCount() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: incrementCommentCount,
-    onSuccess: (_, featureRequestId) => {
-      // Update the comment count in cache
-      queryClient.setQueryData<FeatureRequest>(
-        featureRequestKeys.detail(featureRequestId),
-        (old) =>
-          old ? { ...old, commentsCount: old.commentsCount + 1 } : undefined
+    onMutate: async (featureRequestId) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({
+        queryKey: featureRequestKeys.detail(featureRequestId),
+      });
+
+      // Snapshot the previous value
+      const previousFeatureRequest = queryClient.getQueryData<FeatureRequest>(
+        featureRequestKeys.detail(featureRequestId)
       );
+
+      // Optimistically update the cache
+      if (previousFeatureRequest) {
+        queryClient.setQueryData<FeatureRequest>(
+          featureRequestKeys.detail(featureRequestId),
+          {
+            ...previousFeatureRequest,
+            commentsCount: previousFeatureRequest.commentsCount + 1,
+          }
+        );
+      }
+
+      return { previousFeatureRequest };
+    },
+    onError: (error, featureRequestId, context) => {
+      // Rollback on error
+      if (context?.previousFeatureRequest) {
+        queryClient.setQueryData(
+          featureRequestKeys.detail(featureRequestId),
+          context.previousFeatureRequest
+        );
+      }
+    },
+    onSettled: (_, __, featureRequestId) => {
+      // Always refetch after error or success
+      queryClient.invalidateQueries({
+        queryKey: featureRequestKeys.detail(featureRequestId),
+      });
       queryClient.invalidateQueries({ queryKey: featureRequestKeys.lists() });
     },
   });
@@ -269,15 +301,47 @@ export function useDecrementCommentCount() {
 
   return useMutation({
     mutationFn: decrementCommentCount,
-    onSuccess: (_, featureRequestId) => {
-      // Update the comment count in cache
-      queryClient.setQueryData<FeatureRequest>(
-        featureRequestKeys.detail(featureRequestId),
-        (old) =>
-          old
-            ? { ...old, commentsCount: Math.max(0, old.commentsCount - 1) }
-            : undefined
+    onMutate: async (featureRequestId) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({
+        queryKey: featureRequestKeys.detail(featureRequestId),
+      });
+
+      // Snapshot the previous value
+      const previousFeatureRequest = queryClient.getQueryData<FeatureRequest>(
+        featureRequestKeys.detail(featureRequestId)
       );
+
+      // Optimistically update the cache
+      if (previousFeatureRequest) {
+        queryClient.setQueryData<FeatureRequest>(
+          featureRequestKeys.detail(featureRequestId),
+          {
+            ...previousFeatureRequest,
+            commentsCount: Math.max(
+              0,
+              previousFeatureRequest.commentsCount - 1
+            ),
+          }
+        );
+      }
+
+      return { previousFeatureRequest };
+    },
+    onError: (error, featureRequestId, context) => {
+      // Rollback on error
+      if (context?.previousFeatureRequest) {
+        queryClient.setQueryData(
+          featureRequestKeys.detail(featureRequestId),
+          context.previousFeatureRequest
+        );
+      }
+    },
+    onSettled: (_, __, featureRequestId) => {
+      // Always refetch after error or success
+      queryClient.invalidateQueries({
+        queryKey: featureRequestKeys.detail(featureRequestId),
+      });
       queryClient.invalidateQueries({ queryKey: featureRequestKeys.lists() });
     },
   });
