@@ -124,8 +124,14 @@ export function CommentList({ featureRequestId }: CommentListProps) {
 
   const queryParams: CommentsQuery = { featureRequestId, limit: 20 };
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-    useInfiniteComments(queryParams);
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    error,
+  } = useInfiniteComments(queryParams);
 
   const createComment = useCreateComment();
   const updateComment = useUpdateComment();

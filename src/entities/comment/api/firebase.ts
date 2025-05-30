@@ -146,35 +146,41 @@ export async function getCommentsWithCursor(
   hasMore: boolean;
   lastDoc?: QueryDocumentSnapshot<DocumentData>;
 }> {
-  const { featureRequestId, limit: queryLimit = 20 } = queryParams;
+  try {
+    const { featureRequestId, limit: queryLimit = 20 } = queryParams;
 
-  let q = query(
-    collection(db, COLLECTIONS.COMMENTS),
-    where("featureRequestId", "==", featureRequestId),
-    orderBy("createdAt", "asc"),
-    limit(queryLimit)
-  );
+    let q = query(
+      collection(db, COLLECTIONS.COMMENTS),
+      where("featureRequestId", "==", featureRequestId),
+      orderBy("createdAt", "asc"),
+      limit(queryLimit)
+    );
 
-  // Add cursor for pagination
-  if (lastDoc) {
-    q = query(q, startAfter(lastDoc));
+    // Add cursor for pagination
+    if (lastDoc) {
+      q = query(q, startAfter(lastDoc));
+    }
+
+    const querySnapshot = await getDocs(q);
+
+    const comments: Comment[] = [];
+    querySnapshot.forEach((doc) => {
+      const comment = convertFirestoreCommentDoc(doc);
+      comments.push(comment);
+    });
+
+    const hasMore = querySnapshot.docs.length === queryLimit;
+    const newLastDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
+
+    return {
+      comments,
+      hasMore,
+      lastDoc: newLastDoc,
+    };
+  } catch (error) {
+    console.error("Error in getCommentsWithCursor:", error);
+    throw error;
   }
-
-  const querySnapshot = await getDocs(q);
-
-  const comments: Comment[] = [];
-  querySnapshot.forEach((doc) => {
-    comments.push(convertFirestoreCommentDoc(doc));
-  });
-
-  const hasMore = querySnapshot.docs.length === queryLimit;
-  const newLastDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
-
-  return {
-    comments,
-    hasMore,
-    lastDoc: newLastDoc,
-  };
 }
 
 // Get comment count for a feature request
