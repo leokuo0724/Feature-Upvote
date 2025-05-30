@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -16,9 +16,12 @@ import {
   Textarea,
   Badge,
 } from "@/shared/ui";
-import { CreateFeatureRequestData } from "@/shared/types";
+import { CreateFeatureRequestData, FeatureRequest } from "@/shared/types";
 import { useAuth } from "@/shared/hooks/use-auth";
-import { useCreateFeatureRequest } from "@/entities/feature-request";
+import {
+  useCreateFeatureRequest,
+  useUpdateFeatureRequest,
+} from "@/entities/feature-request";
 
 const createFeatureRequestSchema = z.object({
   title: z
@@ -37,17 +40,22 @@ interface CreateFeatureRequestFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
+  editData?: FeatureRequest;
 }
 
 export function CreateFeatureRequestForm({
   open,
   onOpenChange,
   onSuccess,
+  editData,
 }: CreateFeatureRequestFormProps) {
   const { user } = useAuth();
   const createFeatureRequest = useCreateFeatureRequest();
+  const updateFeatureRequest = useUpdateFeatureRequest();
   const [labels, setLabels] = useState<string[]>([]);
   const [labelInput, setLabelInput] = useState("");
+
+  const isEditMode = !!editData;
 
   const {
     register,
@@ -56,7 +64,30 @@ export function CreateFeatureRequestForm({
     reset,
   } = useForm<CreateFeatureRequestFormData>({
     resolver: zodResolver(createFeatureRequestSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+    },
   });
+
+  // 初始化編輯模式的數據
+  useEffect(() => {
+    if (editData && open) {
+      reset({
+        title: editData.title,
+        description: editData.description,
+      });
+      setLabels(editData.labels || []);
+    } else if (!open) {
+      // 關閉時重置表單
+      reset({
+        title: "",
+        description: "",
+      });
+      setLabels([]);
+      setLabelInput("");
+    }
+  }, [editData, open, reset]);
 
   const handleAddLabel = () => {
     const trimmedLabel = labelInput.trim();
@@ -86,12 +117,23 @@ export function CreateFeatureRequestForm({
         labels,
       };
 
-      await createFeatureRequest.mutateAsync({
-        data: createData,
-        authorId: user.uid,
-        authorName: user.displayName || "Anonymous",
-        authorEmail: user.email || "",
-      });
+      if (isEditMode) {
+        await updateFeatureRequest.mutateAsync({
+          id: editData.id,
+          updates: {
+            title: createData.title,
+            description: createData.description,
+            labels: createData.labels,
+          },
+        });
+      } else {
+        await createFeatureRequest.mutateAsync({
+          data: createData,
+          authorId: user.uid,
+          authorName: user.displayName || "Anonymous",
+          authorEmail: user.email || "",
+        });
+      }
 
       // Reset form
       reset();
@@ -119,7 +161,9 @@ export function CreateFeatureRequestForm({
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>Create Feature Request</DialogTitle>
+          <DialogTitle>
+            {isEditMode ? "Edit Feature Request" : "Create Feature Request"}
+          </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -212,7 +256,13 @@ export function CreateFeatureRequestForm({
               Cancel
             </Button>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Creating..." : "Create Feature Request"}
+              {isSubmitting
+                ? isEditMode
+                  ? "Updating..."
+                  : "Creating..."
+                : isEditMode
+                ? "Update Request"
+                : "Create Request"}
             </Button>
           </DialogFooter>
         </form>

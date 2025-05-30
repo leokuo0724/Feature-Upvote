@@ -14,6 +14,7 @@ import {
   CardContent,
   CardFooter,
   CardHeader,
+  CardTitle,
   Badge,
   Button,
   DropdownMenu,
@@ -21,11 +22,23 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/shared/ui";
-import { FeatureRequest } from "@/shared/types";
+import { FeatureRequest, FeatureRequestStatus } from "@/shared/types";
 import { useAuth } from "@/shared/hooks/use-auth";
-import { useToggleUpvote } from "@/entities/feature-request";
+import {
+  useToggleUpvote,
+  useUpdateFeatureRequest,
+} from "@/entities/feature-request";
 import { formatCount, truncateText } from "@/shared/lib/utils";
+import { useToast } from "@/shared/ui";
 
 interface FeatureRequestCardProps {
   featureRequest: FeatureRequest;
@@ -54,6 +67,8 @@ export function FeatureRequestCard({
 }: FeatureRequestCardProps) {
   const { user } = useAuth();
   const toggleUpvote = useToggleUpvote();
+  const updateFeatureRequest = useUpdateFeatureRequest();
+  const { toast } = useToast();
   const [isUpvoting, setIsUpvoting] = useState(false);
 
   const hasUpvoted = user ? featureRequest.upvotedBy.includes(user.uid) : false;
@@ -61,12 +76,17 @@ export function FeatureRequestCard({
     user && (user.isAdmin || user.uid === featureRequest.authorId);
   const canDelete =
     user && (user.isAdmin || user.uid === featureRequest.authorId);
+  const isAdmin = user?.isAdmin;
 
   const handleUpvote = async (e: React.MouseEvent) => {
     e.stopPropagation();
 
     if (!user) {
-      // TODO: Show login modal or redirect to login
+      toast({
+        title: "Login Required",
+        description: "Please sign in to vote on feature requests.",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -95,6 +115,27 @@ export function FeatureRequestCard({
 
   const handleCardClick = () => {
     onClick?.(featureRequest);
+  };
+
+  const handleStatusChange = async (newStatus: FeatureRequestStatus) => {
+    if (!isAdmin) return;
+
+    try {
+      await updateFeatureRequest.mutateAsync({
+        id: featureRequest.id,
+        updates: { status: newStatus },
+      });
+      toast({
+        title: "Success",
+        description: `Status updated to ${newStatus}`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update status",
+        variant: "destructive",
+      });
+    }
   };
 
   return (

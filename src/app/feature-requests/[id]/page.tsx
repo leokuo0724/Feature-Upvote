@@ -300,7 +300,7 @@ export default function FeatureRequestDetailPage() {
             open={showEditForm}
             onOpenChange={setShowEditForm}
             onSuccess={handleEditSuccess}
-            // TODO: Add edit mode props to pass existing data
+            editData={featureRequest}
           />
         )}
       </div>
