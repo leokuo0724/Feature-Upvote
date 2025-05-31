@@ -124,14 +124,18 @@ export default function AdminLabelsPage() {
     <div className="container mx-auto py-8">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold">Label Management</h1>
             <p className="text-muted-foreground mt-2">
               Manage labels for feature requests
             </p>
           </div>
-          <Button onClick={() => setIsCreating(true)} disabled={isCreating}>
+          <Button
+            className="w-full sm:w-fit"
+            onClick={() => setIsCreating(true)}
+            disabled={isCreating}
+          >
             <Plus className="h-4 w-4 mr-2" />
             Add Label
           </Button>

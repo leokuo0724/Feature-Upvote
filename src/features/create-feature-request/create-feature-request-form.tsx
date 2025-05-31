@@ -136,7 +136,7 @@ export function CreateFeatureRequestForm({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="max-w-[90vw] sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>
             {isEditMode ? "Edit Feature Request" : "Create Feature Request"}

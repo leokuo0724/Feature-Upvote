@@ -195,7 +195,7 @@ function FeatureRequestsContent() {
     <div className="container mx-auto py-8">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold text-foreground mb-2">
               Feature Requests
@@ -206,7 +206,10 @@ function FeatureRequestsContent() {
           </div>
 
           {user && (
-            <Button onClick={() => setShowCreateForm(true)}>
+            <Button
+              className="w-full sm:w-fit"
+              onClick={() => setShowCreateForm(true)}
+            >
               <Plus className="h-4 w-4 mr-2" />
               New Request
             </Button>
@@ -214,9 +217,9 @@ function FeatureRequestsContent() {
         </div>
 
         {/* Tab Selection and Controls */}
-        <div className="flex flex-col md:flex-row gap-4 justify-between mb-6">
+        <div className="flex  gap-4 justify-between mb-6">
           {/* Desktop: Tabs, Mobile: Dropdown */}
-          <div className="flex-1">
+          <div>
             {/* Desktop Tabs (hidden on mobile) */}
             <div className="hidden md:block">
               <Tabs
