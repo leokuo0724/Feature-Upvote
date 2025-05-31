@@ -15,13 +15,23 @@ import {
   Textarea,
   Badge,
   LabelSelector,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/shared/ui";
-import { CreateFeatureRequestData, FeatureRequest } from "@/shared/types";
+import {
+  CreateFeatureRequestData,
+  FeatureRequest,
+  FeatureRequestStatus,
+} from "@/shared/types";
 import { useAuth } from "@/shared/hooks/use-auth";
 import {
   useCreateFeatureRequest,
   useUpdateFeatureRequest,
 } from "@/entities/feature-request";
+import { ALL_STATUSES } from "@/shared/config/constants";
 
 const createFeatureRequestSchema = z.object({
   title: z
@@ -53,6 +63,8 @@ export function CreateFeatureRequestForm({
   const createFeatureRequest = useCreateFeatureRequest();
   const updateFeatureRequest = useUpdateFeatureRequest();
   const [labelIds, setLabelIds] = useState<string[]>([]);
+  const [selectedStatus, setSelectedStatus] =
+    useState<FeatureRequestStatus>("Open");
 
   const isEditMode = !!editData;
 
@@ -77,6 +89,7 @@ export function CreateFeatureRequestForm({
         description: editData.description,
       });
       setLabelIds(editData.labels || []);
+      setSelectedStatus(editData.status);
     } else if (!open) {
       // 關閉時重置表單
       reset({
@@ -84,6 +97,7 @@ export function CreateFeatureRequestForm({
         description: "",
       });
       setLabelIds([]);
+      setSelectedStatus("Open");
     }
   }, [editData, open, reset]);
 
@@ -97,13 +111,20 @@ export function CreateFeatureRequestForm({
       };
 
       if (isEditMode) {
+        const updates: any = {
+          title: createData.title,
+          description: createData.description,
+          labels: createData.labels,
+        };
+
+        // Only admin can update status
+        if (user.isAdmin) {
+          updates.status = selectedStatus;
+        }
+
         await updateFeatureRequest.mutateAsync({
           id: editData.id,
-          updates: {
-            title: createData.title,
-            description: createData.description,
-            labels: createData.labels,
-          },
+          updates,
         });
       } else {
         await createFeatureRequest.mutateAsync({
@@ -117,6 +138,7 @@ export function CreateFeatureRequestForm({
       // Reset form
       reset();
       setLabelIds([]);
+      setSelectedStatus("Open");
       onOpenChange(false);
       onSuccess?.();
     } catch (error) {
@@ -127,6 +149,7 @@ export function CreateFeatureRequestForm({
   const handleClose = () => {
     reset();
     setLabelIds([]);
+    setSelectedStatus("Open");
     onOpenChange(false);
   };
 
@@ -186,6 +209,33 @@ export function CreateFeatureRequestForm({
                 onSelectionChange={setLabelIds}
                 placeholder="Select labels for this feature request..."
               />
+            </div>
+          )}
+
+          {/* Status - Only for admins in edit mode */}
+          {user.isAdmin && isEditMode && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Status</label>
+              <Select
+                value={selectedStatus}
+                onValueChange={(value: FeatureRequestStatus) =>
+                  setSelectedStatus(value)
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  {ALL_STATUSES.map((status) => (
+                    <SelectItem key={status} value={status}>
+                      {status}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                Change the status of this feature request
+              </p>
             </div>
           )}
 
