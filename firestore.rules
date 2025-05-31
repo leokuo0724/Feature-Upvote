@@ -41,12 +41,14 @@ service cloud.firestore {
       allow read: if true;
       
       // Authenticated users can create feature requests
-      allow create: if isAuthenticated() && 
-                       request.auth.uid == resource.data.authorId;
+      allow create: if isAuthenticated();
       
       // Authors and admins can update feature requests
+      // OR any authenticated user can update commentsCount field
       allow update: if isAuthenticated() && 
-                       (isOwner(resource.data.authorId) || isAdmin());
+                       (isOwner(resource.data.authorId) || 
+                        isAdmin() ||
+                        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['commentsCount', 'updatedAt'])));
       
       // Authors and admins can delete feature requests
       allow delete: if isAuthenticated() && 
@@ -59,8 +61,7 @@ service cloud.firestore {
       allow read: if true;
       
       // Authenticated users can create comments
-      allow create: if isAuthenticated() && 
-                       request.auth.uid == resource.data.authorId;
+      allow create: if isAuthenticated();
       
       // Authors and admins can update comments
       allow update: if isAuthenticated() && 

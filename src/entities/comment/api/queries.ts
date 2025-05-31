@@ -82,7 +82,6 @@ export function useCommentCount(featureRequestId: string) {
 // Mutations
 export function useCreateComment() {
   const queryClient = useQueryClient();
-  const incrementCommentCount = useIncrementCommentCount();
 
   return useMutation({
     mutationFn: ({
@@ -109,8 +108,13 @@ export function useCreateComment() {
         queryKey: commentKeys.count(data.featureRequestId),
       });
 
-      // Increment the comment count in the feature request
-      await incrementCommentCount.mutateAsync(data.featureRequestId);
+      // Invalidate feature request lists to update comment count display
+      queryClient.invalidateQueries({
+        queryKey: ["featureRequests", "list"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["featureRequests", "detail", data.featureRequestId],
+      });
 
       toast({
         title: "Success",
@@ -156,7 +160,6 @@ export function useUpdateComment() {
 
 export function useDeleteComment() {
   const queryClient = useQueryClient();
-  const decrementCommentCount = useDecrementCommentCount();
 
   return useMutation({
     mutationFn: ({
@@ -177,8 +180,13 @@ export function useDeleteComment() {
         queryKey: commentKeys.count(featureRequestId),
       });
 
-      // Decrement the comment count in the feature request
-      await decrementCommentCount.mutateAsync(featureRequestId);
+      // Invalidate feature request lists to update comment count display
+      queryClient.invalidateQueries({
+        queryKey: ["featureRequests", "list"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["featureRequests", "detail", featureRequestId],
+      });
 
       toast({
         title: "Success",
