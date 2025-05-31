@@ -20,11 +20,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/ui";
-import { FeatureRequestStatus, FeatureRequestSort } from "@/shared/types";
+import {
+  FeatureRequestStatus,
+  FeatureRequestSort,
+  FeatureRequest,
+} from "@/shared/types";
 import { useAuth } from "@/shared/hooks/use-auth";
 import {
   useInfiniteFeatureRequests,
   useTabGroupCounts,
+  useDeleteFeatureRequest,
 } from "@/entities/feature-request";
 import { FeatureRequestCard } from "@/widgets/feature-request-card";
 import { CreateFeatureRequestForm } from "@/features/create-feature-request";
@@ -101,16 +106,21 @@ function FeatureRequestsContent() {
   const { user } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [editingFeatureRequest, setEditingFeatureRequest] =
+    useState<FeatureRequest | null>(null);
+  const [sortBy, setSortBy] = useState<string>("upvotes");
 
   // Get tab group from URL or default to "all"
   const tabFromUrl = searchParams.get("tab") as TabGroup | null;
   const [activeTab, setActiveTab] = useState<TabGroup>(tabFromUrl || "all");
-  const [sortBy, setSortBy] = useState<string>("upvotes");
-  const [showCreateForm, setShowCreateForm] = useState(false);
 
   // Get tab counts
   const { data: tabCounts = { all: 0, open: 0, "in-progress": 0, done: 0 } } =
     useTabGroupCounts();
+
+  // Import delete mutation
+  const deleteFeatureRequest = useDeleteFeatureRequest();
 
   // Update URL when tab changes (simplified)
   const handleTabChange = (value: string) => {
@@ -169,6 +179,26 @@ function FeatureRequestsContent() {
   const handleFeatureRequestClick = (featureRequest: any) => {
     // Navigate to feature request details page
     window.location.href = `/feature-requests/${featureRequest.id}`;
+  };
+
+  const handleEdit = (featureRequest: FeatureRequest) => {
+    setEditingFeatureRequest(featureRequest);
+  };
+
+  const handleDelete = async (featureRequest: FeatureRequest) => {
+    if (!confirm("Are you sure you want to delete this feature request?")) {
+      return;
+    }
+
+    try {
+      await deleteFeatureRequest.mutateAsync(featureRequest.id);
+    } catch (error) {
+      console.error("Error deleting feature request:", error);
+    }
+  };
+
+  const handleEditSuccess = () => {
+    setEditingFeatureRequest(null);
   };
 
   const getSortIcon = () => {
@@ -285,7 +315,7 @@ function FeatureRequestsContent() {
               {sortOptions.map((option) => (
                 <DropdownMenuItem
                   key={option.value}
-                  onClick={() => setSortBy(option.value)}
+                  onClick={() => setSortBy(option.value as string)}
                   className="flex items-center gap-2"
                 >
                   {React.createElement(option.icon, { className: "h-4 w-4" })}
@@ -341,6 +371,8 @@ function FeatureRequestsContent() {
                     key={featureRequest.id}
                     featureRequest={featureRequest}
                     onClick={handleFeatureRequestClick}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
                   />
                 ))}
               </div>
@@ -367,6 +399,16 @@ function FeatureRequestsContent() {
           onOpenChange={setShowCreateForm}
           onSuccess={handleCreateSuccess}
         />
+
+        {/* Edit Feature Request Form */}
+        {editingFeatureRequest && (
+          <CreateFeatureRequestForm
+            open={!!editingFeatureRequest}
+            onOpenChange={(open) => !open && setEditingFeatureRequest(null)}
+            onSuccess={handleEditSuccess}
+            editData={editingFeatureRequest}
+          />
+        )}
       </div>
     </div>
   );
