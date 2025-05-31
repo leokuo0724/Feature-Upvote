@@ -39,32 +39,27 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
 
   const fetchSettings = async (): Promise<void> => {
     try {
-      console.log("🔄 Fetching app settings...");
       setIsLoading(true);
       setError(null);
 
       const fetchedSettings = await getAppSettings();
 
-      console.log("✅ App settings loaded:", fetchedSettings);
       setSettings(fetchedSettings);
     } catch (err) {
-      console.error("❌ Error fetching settings:", err);
       const errorObj =
         err instanceof Error ? err : new Error("Failed to fetch settings");
       setError(errorObj);
 
       // Use default settings on error
-      console.log("🔧 Using default settings due to error");
+
       setSettings(defaultSettings);
     } finally {
-      console.log("🏁 Setting isLoading to false");
       setIsLoading(false);
     }
   };
 
   // Fetch settings on mount
   useEffect(() => {
-    console.log("🚀 SettingsProvider mounted, fetching settings...");
     fetchSettings();
   }, []);
 
@@ -74,12 +69,6 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     error,
     refetch: fetchSettings,
   };
-
-  console.log("🔍 SettingsProvider render:", {
-    hasSettings: !!settings,
-    isLoading,
-    hasError: !!error,
-  });
 
   return (
     <SettingsContext.Provider value={contextValue}>

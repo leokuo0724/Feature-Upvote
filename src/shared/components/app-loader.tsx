@@ -10,14 +10,7 @@ interface AppLoaderProps {
 export function AppLoader({ children }: AppLoaderProps) {
   const { isLoading, error, settings } = useSettings();
 
-  console.log("🔍 AppLoader state:", {
-    isLoading,
-    error: !!error,
-    hasSettings: !!settings,
-  });
-
   if (isLoading) {
-    console.log("⏳ AppLoader: Showing loading screen");
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-4">
@@ -29,7 +22,6 @@ export function AppLoader({ children }: AppLoaderProps) {
   }
 
   if (error) {
-    console.log("❌ AppLoader: Showing error screen");
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-4">
@@ -50,6 +42,5 @@ export function AppLoader({ children }: AppLoaderProps) {
     );
   }
 
-  console.log("✅ AppLoader: Rendering app content");
   return <>{children}</>;
 }
