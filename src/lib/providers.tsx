@@ -5,6 +5,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { ThemeProvider } from "next-themes";
 import { useState } from "react";
 import { SettingsProvider } from "@/shared/contexts/settings-context";
+import { AuthProvider } from "@/shared/contexts/auth-context";
 import { ThemeProvider as CustomThemeProvider } from "@/shared/components/theme-provider";
 import { AppLoader } from "@/shared/components/app-loader";
 
@@ -41,12 +42,14 @@ export function Providers({ children }: { children: React.ReactNode }) {
         disableTransitionOnChange
       >
         <SettingsProvider>
-          <AppLoader>
-            <CustomThemeProvider>
-              {children}
-              <ReactQueryDevtools initialIsOpen={false} />
-            </CustomThemeProvider>
-          </AppLoader>
+          <AuthProvider>
+            <AppLoader>
+              <CustomThemeProvider>
+                {children}
+                <ReactQueryDevtools initialIsOpen={false} />
+              </CustomThemeProvider>
+            </AppLoader>
+          </AuthProvider>
         </SettingsProvider>
       </ThemeProvider>
     </QueryClientProvider>

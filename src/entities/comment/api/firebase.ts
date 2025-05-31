@@ -80,6 +80,7 @@ export async function createComment(
 export async function getComment(id: string): Promise<Comment | null> {
   const commentRef = doc(db, COLLECTIONS.COMMENTS, id);
   const commentSnap = await getDoc(commentRef);
+  console.log("comment snap");
 
   if (commentSnap.exists()) {
     return convertFirestoreCommentDoc(commentSnap);

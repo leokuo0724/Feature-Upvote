@@ -62,6 +62,7 @@ export async function createLabel(
 export async function getLabel(id: string): Promise<Label | null> {
   const labelRef = doc(db, COLLECTIONS.LABELS, id);
   const labelSnap = await getDoc(labelRef);
+  console.log("label snap");
 
   if (labelSnap.exists()) {
     return convertFirestoreLabelDoc(labelSnap);

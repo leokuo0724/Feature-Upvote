@@ -130,6 +130,7 @@ export function useUpsertUserOnLogin() {
   const queryClient = useQueryClient();
 
   return useMutation({
+    mutationKey: ["upsertUserOnLogin"],
     mutationFn: upsertUserOnLogin,
     onSuccess: (_, userData) => {
       // Invalidate user cache to refetch updated data

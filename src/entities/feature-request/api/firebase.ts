@@ -96,6 +96,7 @@ export async function getFeatureRequest(
 ): Promise<FeatureRequest | null> {
   const featureRequestRef = doc(db, COLLECTIONS.FEATURE_REQUESTS, id);
   const featureRequestSnap = await getDoc(featureRequestRef);
+  console.log("feature request snap");
 
   if (featureRequestSnap.exists()) {
     return convertFirestoreDoc(featureRequestSnap);
@@ -132,6 +133,7 @@ export async function toggleUpvote(
     featureRequestId
   );
   const featureRequestSnap = await getDoc(featureRequestRef);
+  console.log("toggle upvote");
 
   if (!featureRequestSnap.exists()) {
     throw new Error("Feature request not found");

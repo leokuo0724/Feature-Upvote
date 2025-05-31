@@ -53,6 +53,7 @@ async function getCachedAnalytics(
   const cacheId = `${type}_${period}`;
   const cacheRef = doc(db, COLLECTIONS.ANALYTICS, cacheId);
   const cacheSnap = await getDoc(cacheRef);
+  console.log("cached analytics");
 
   if (cacheSnap.exists()) {
     return convertFirestoreAnalyticsDoc(cacheSnap.data(), cacheId);
