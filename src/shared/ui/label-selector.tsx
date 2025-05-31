@@ -86,7 +86,7 @@ export function LabelSelector({
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-full p-0">
+          <DropdownMenuContent className="w-[var(--radix-dropdown-menu-trigger-width)] min-w-[8rem] p-0">
             <div className="max-h-60 overflow-auto">
               {isLoading ? (
                 <div className="p-4 text-center text-sm text-muted-foreground">

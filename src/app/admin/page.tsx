@@ -63,7 +63,7 @@ function StatCard({
 }: StatCardProps) {
   return (
     <Card>
-      <CardContent className="pt-6">
+      <CardContent className="pt-4">
         <div className="text-center">
           <div className="flex items-center justify-center gap-2 mb-2">
             <div className="text-2xl font-bold text-primary">

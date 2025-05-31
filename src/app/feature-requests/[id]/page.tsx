@@ -154,7 +154,7 @@ export default function FeatureRequestDetailPage() {
         <Button
           variant="ghost"
           onClick={() => router.push("/feature-requests")}
-          className="mb-4"
+          className="mb-0 sm:mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Feature Requests
@@ -163,13 +163,67 @@ export default function FeatureRequestDetailPage() {
         {/* Main Content */}
         <Card>
           <CardHeader>
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1 min-w-0">
-                <CardTitle className="text-2xl mb-3">
-                  {featureRequest.title}
-                </CardTitle>
+            <div className="flex flex-col items-start justify-between gap-4">
+              <div className="w-full ">
+                <div className="flex flex-row items-center justify-between gap-4 mb-3">
+                  <CardTitle className="text-2xl ">
+                    {featureRequest.title}
+                  </CardTitle>
+                  <div className="flex items-center gap-2">
+                    {/* Upvote Button */}
+                    <Button
+                      variant={hasUpvoted ? "default" : "outline"}
+                      size="sm"
+                      className="flex items-center gap-2"
+                      onClick={handleUpvote}
+                      disabled={isUpvoting || !user}
+                    >
+                      <ChevronUp
+                        className={`h-4 w-4 ${
+                          hasUpvoted ? "fill-current" : ""
+                        }`}
+                      />
+                      <span>{formatCount(featureRequest.upvotes)}</span>
+                    </Button>
 
-                <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
+                    {/* Actions Menu */}
+                    {(canEdit || canDelete) && (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0"
+                          >
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          {canEdit && (
+                            <DropdownMenuItem onClick={handleEdit}>
+                              <Edit className="mr-2 h-4 w-4" />
+                              Edit
+                            </DropdownMenuItem>
+                          )}
+                          {canDelete && (
+                            <>
+                              {canEdit && <DropdownMenuSeparator />}
+                              <DropdownMenuItem
+                                onClick={handleDelete}
+                                className="text-destructive focus:text-destructive"
+                              >
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                Delete
+                              </DropdownMenuItem>
+                            </>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
                   <div className="flex items-center gap-1">
                     <User className="h-4 w-4" />
                     <span>by {featureRequest.authorName}</span>
@@ -196,53 +250,6 @@ export default function FeatureRequestDetailPage() {
                   ))}
                 </div>
               </div>
-
-              <div className="flex items-center gap-2">
-                {/* Upvote Button */}
-                <Button
-                  variant={hasUpvoted ? "default" : "outline"}
-                  size="sm"
-                  className="flex items-center gap-2"
-                  onClick={handleUpvote}
-                  disabled={isUpvoting || !user}
-                >
-                  <ChevronUp
-                    className={`h-4 w-4 ${hasUpvoted ? "fill-current" : ""}`}
-                  />
-                  <span>{formatCount(featureRequest.upvotes)}</span>
-                </Button>
-
-                {/* Actions Menu */}
-                {(canEdit || canDelete) && (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      {canEdit && (
-                        <DropdownMenuItem onClick={handleEdit}>
-                          <Edit className="mr-2 h-4 w-4" />
-                          Edit
-                        </DropdownMenuItem>
-                      )}
-                      {canDelete && (
-                        <>
-                          {canEdit && <DropdownMenuSeparator />}
-                          <DropdownMenuItem
-                            onClick={handleDelete}
-                            className="text-destructive focus:text-destructive"
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Delete
-                          </DropdownMenuItem>
-                        </>
-                      )}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                )}
-              </div>
             </div>
           </CardHeader>
 
@@ -257,7 +264,7 @@ export default function FeatureRequestDetailPage() {
 
         {/* Author Info */}
         <Card>
-          <CardContent className="pt-6">
+          <CardContent className="pt-4">
             <div className="flex items-center gap-3">
               <Avatar className="h-10 w-10">
                 <AvatarImage src={undefined} />
