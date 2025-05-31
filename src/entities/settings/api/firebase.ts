@@ -46,7 +46,6 @@ export async function getAppSettings(): Promise<AppSettings> {
   try {
     const settingsRef = doc(db, COLLECTIONS.SETTINGS, SETTINGS_DOC_ID);
     const settingsSnap = await getDoc(settingsRef);
-    console.log("settings snap");
 
     if (settingsSnap.exists()) {
       return convertFirestoreSettingsDoc(settingsSnap);
@@ -79,7 +78,6 @@ export async function updateAppSettings(
   try {
     const settingsRef = doc(db, COLLECTIONS.SETTINGS, SETTINGS_DOC_ID);
     const settingsSnap = await getDoc(settingsRef);
-    console.log("update settings snap");
 
     if (settingsSnap.exists()) {
       // Update existing settings

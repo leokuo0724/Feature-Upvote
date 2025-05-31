@@ -94,14 +94,18 @@ export async function createFeatureRequest(
 export async function getFeatureRequest(
   id: string
 ): Promise<FeatureRequest | null> {
-  const featureRequestRef = doc(db, COLLECTIONS.FEATURE_REQUESTS, id);
-  const featureRequestSnap = await getDoc(featureRequestRef);
-  console.log("feature request snap");
+  try {
+    const featureRequestRef = doc(db, COLLECTIONS.FEATURE_REQUESTS, id);
+    const featureRequestSnap = await getDoc(featureRequestRef);
 
-  if (featureRequestSnap.exists()) {
-    return convertFirestoreDoc(featureRequestSnap);
+    if (featureRequestSnap.exists()) {
+      return convertFirestoreDoc(featureRequestSnap);
+    }
+    return null;
+  } catch (error) {
+    console.error("Error getting feature request:", error);
+    return null;
   }
-  return null;
 }
 
 // Update a feature request
@@ -133,7 +137,6 @@ export async function toggleUpvote(
     featureRequestId
   );
   const featureRequestSnap = await getDoc(featureRequestRef);
-  console.log("toggle upvote");
 
   if (!featureRequestSnap.exists()) {
     throw new Error("Feature request not found");

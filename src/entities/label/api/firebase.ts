@@ -60,14 +60,18 @@ export async function createLabel(
 
 // Get a single label by ID
 export async function getLabel(id: string): Promise<Label | null> {
-  const labelRef = doc(db, COLLECTIONS.LABELS, id);
-  const labelSnap = await getDoc(labelRef);
-  console.log("label snap");
+  try {
+    const labelRef = doc(db, COLLECTIONS.LABELS, id);
+    const labelSnap = await getDoc(labelRef);
 
-  if (labelSnap.exists()) {
-    return convertFirestoreLabelDoc(labelSnap);
+    if (labelSnap.exists()) {
+      return convertFirestoreLabelDoc(labelSnap);
+    }
+    return null;
+  } catch (error) {
+    console.error("Error getting label:", error);
+    return null;
   }
-  return null;
 }
 
 // Get all labels

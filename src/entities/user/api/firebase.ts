@@ -84,7 +84,6 @@ export async function upsertUserOnLogin(
 ): Promise<void> {
   const userRef = doc(db, COLLECTIONS.USERS, userData.uid);
   const userSnap = await getDoc(userRef);
-  console.log("upsert user on login");
 
   if (userSnap.exists()) {
     await updateDoc(userRef, {
@@ -109,7 +108,6 @@ export async function getUser(uid: string): Promise<User | null> {
   try {
     const userRef = doc(db, COLLECTIONS.USERS, uid);
     const userSnap = await getDoc(userRef);
-    console.log("get user");
 
     if (userSnap.exists()) {
       return convertFirestoreUserDoc(userSnap);
@@ -137,7 +135,6 @@ export async function checkIsAdmin(email: string): Promise<boolean> {
 
   const adminEmailRef = doc(db, COLLECTIONS.ADMIN_EMAILS, email);
   const adminEmailSnap = await getDoc(adminEmailRef);
-  console.log("admin email snap");
 
   return adminEmailSnap.exists();
 }

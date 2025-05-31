@@ -56,7 +56,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const unsubscribe = onAuthStateChanged(
       auth,
       async (user: FirebaseUser | null) => {
-        console.log("Auth state changed");
         setFirebaseUser(user);
 
         if (user) {
