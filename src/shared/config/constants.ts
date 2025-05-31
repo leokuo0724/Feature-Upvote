@@ -8,8 +8,7 @@ export const FEATURE_REQUEST_STATUSES: FeatureRequestStatus[] = [
 
 export const ADMIN_STATUSES: FeatureRequestStatus[] = [
   "Won't Do",
-  "Pending",
-  "Under Discussion",
+  "Considering",
   "Will Do",
 ];
 

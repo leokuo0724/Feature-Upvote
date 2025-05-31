@@ -3,8 +3,7 @@ export type FeatureRequestStatus =
   | "In Progress"
   | "Completed"
   | "Won't Do"
-  | "Pending"
-  | "Under Discussion"
+  | "Considering"
   | "Will Do";
 
 export interface FeatureRequest {
@@ -38,6 +37,7 @@ export interface UpdateFeatureRequestData {
 
 export interface FeatureRequestFilters {
   status?: FeatureRequestStatus;
+  statuses?: FeatureRequestStatus[]; // For tab group filtering
   labels?: string[];
   search?: string;
 }

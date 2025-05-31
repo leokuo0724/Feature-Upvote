@@ -170,6 +170,16 @@ function buildQuery(queryParams: FeatureRequestsQuery): Query<DocumentData> {
     q = query(q, where("status", "==", filters.status));
   }
 
+  // Apply multiple status filter (for tab groups)
+  if (filters?.statuses && filters.statuses.length > 0) {
+    if (filters.statuses.length === 1) {
+      q = query(q, where("status", "==", filters.statuses[0]));
+    } else {
+      // Use "in" operator for multiple statuses (max 10 values)
+      q = query(q, where("status", "in", filters.statuses));
+    }
+  }
+
   if (filters?.labels && filters.labels.length > 0) {
     q = query(q, where("labels", "array-contains-any", filters.labels));
   }
@@ -315,4 +325,62 @@ export async function decrementCommentCount(
     commentsCount: increment(-1),
     updatedAt: serverTimestamp(),
   });
+}
+
+// Get status counts efficiently
+export async function getStatusCounts(): Promise<{
+  all: number;
+  open: number;
+  "in-progress": number;
+  done: number;
+}> {
+  try {
+    // Get counts for each status group using separate queries
+    const collectionRef = collection(db, COLLECTIONS.FEATURE_REQUESTS);
+
+    // Query for each status to get counts
+    const [
+      openQuery,
+      consideringQuery,
+      willDoQuery,
+      inProgressQuery,
+      completedQuery,
+      wontDoQuery,
+    ] = await Promise.all([
+      getDocs(query(collectionRef, where("status", "==", "Open"))),
+      getDocs(query(collectionRef, where("status", "==", "Considering"))),
+      getDocs(query(collectionRef, where("status", "==", "Will Do"))),
+      getDocs(query(collectionRef, where("status", "==", "In Progress"))),
+      getDocs(query(collectionRef, where("status", "==", "Completed"))),
+      getDocs(query(collectionRef, where("status", "==", "Won't Do"))),
+    ]);
+
+    const openCount = openQuery.size;
+    const consideringCount = consideringQuery.size;
+    const willDoCount = willDoQuery.size;
+    const inProgressCount = inProgressQuery.size;
+    const completedCount = completedQuery.size;
+    const wontDoCount = wontDoQuery.size;
+
+    return {
+      all:
+        openCount +
+        consideringCount +
+        willDoCount +
+        inProgressCount +
+        completedCount +
+        wontDoCount,
+      open: openCount + consideringCount + willDoCount,
+      "in-progress": inProgressCount,
+      done: completedCount + wontDoCount,
+    };
+  } catch (error) {
+    console.error("Error getting status counts:", error);
+    return {
+      all: 0,
+      open: 0,
+      "in-progress": 0,
+      done: 0,
+    };
+  }
 }

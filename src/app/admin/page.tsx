@@ -36,15 +36,6 @@ const adminFeatures = [
     disabled: true,
   },
   {
-    title: "Analytics",
-    description: "View platform statistics and insights",
-    icon: BarChart3,
-    href: "/admin/analytics",
-    color: "text-purple-600",
-    bgColor: "bg-purple-50",
-    disabled: true,
-  },
-  {
     title: "Settings",
     description: "Configure platform settings and preferences",
     icon: Settings,
@@ -238,7 +229,7 @@ export default function AdminPage() {
         {/* Quick Stats */}
         <div className="mt-12">
           <h2 className="text-xl font-semibold mb-4">Platform Overview</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <StatCard
               title="Active Users (30 Days)"
               value={activeUsers}

@@ -15,6 +15,7 @@ import {
   searchFeatureRequests,
   incrementCommentCount,
   decrementCommentCount,
+  getStatusCounts,
 } from "./firebase";
 import {
   FeatureRequest,
@@ -82,6 +83,16 @@ export function useSearchFeatureRequests(
     queryFn: () => searchFeatureRequests(searchTerm, queryParams),
     enabled: searchTerm.length > 0,
     staleTime: 1 * 60 * 1000, // 1 minute
+  });
+}
+
+// Get counts for tab groups
+export function useTabGroupCounts() {
+  return useQuery({
+    queryKey: [...featureRequestKeys.all, "tabCounts"],
+    queryFn: getStatusCounts,
+    staleTime: 5 * 60 * 1000, // 5 minutes - counts don't change frequently
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 }
 

@@ -44,8 +44,7 @@ const statusColors = {
   "In Progress": "info",
   Completed: "success",
   "Won't Do": "destructive",
-  Pending: "warning",
-  "Under Discussion": "secondary",
+  Considering: "secondary",
   "Will Do": "success",
 } as const;
 
