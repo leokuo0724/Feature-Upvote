@@ -30,6 +30,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  LabelTag,
 } from "@/shared/ui";
 import { FeatureRequest, FeatureRequestStatus } from "@/shared/types";
 import { useAuth } from "@/shared/hooks/use-auth";
@@ -199,10 +200,8 @@ export function FeatureRequestCard({
             {featureRequest.status}
           </Badge>
 
-          {featureRequest.labels.map((label) => (
-            <Badge key={label} variant="outline" className="text-xs">
-              {label}
-            </Badge>
+          {featureRequest.labels.map((labelId) => (
+            <LabelTag key={labelId} labelId={labelId} />
           ))}
         </div>
       </CardContent>

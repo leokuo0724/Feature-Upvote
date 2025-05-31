@@ -34,4 +34,5 @@ export const COLLECTIONS = {
   FEATURE_REQUESTS: "featureRequests",
   COMMENTS: "comments",
   ADMIN_EMAILS: "adminEmails",
+  LABELS: "labels",
 } as const;

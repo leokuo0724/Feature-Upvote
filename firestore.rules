@@ -35,6 +35,14 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // Labels collection
+    match /labels/{labelId} {
+      // Anyone can read labels (needed for display)
+      allow read: if true;
+      // Only admins can manage labels
+      allow write: if isAdmin();
+    }
+
     // Feature requests collection
     match /featureRequests/{requestId} {
       // Anyone can read feature requests
@@ -45,10 +53,13 @@ service cloud.firestore {
       
       // Authors and admins can update feature requests
       // OR any authenticated user can update commentsCount field
+      // BUT only admins can update labels field
       allow update: if isAuthenticated() && 
                        (isOwner(resource.data.authorId) || 
                         isAdmin() ||
-                        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['commentsCount', 'updatedAt'])));
+                        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['commentsCount', 'updatedAt']) &&
+                         !request.resource.data.diff(resource.data).affectedKeys().hasAny(['labels']))) &&
+                       (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['labels']) || isAdmin());
       
       // Authors and admins can delete feature requests
       allow delete: if isAuthenticated() && 

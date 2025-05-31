@@ -10,3 +10,4 @@ export * from "./tabs";
 export * from "./avatar";
 export * from "./dropdown-menu";
 export * from "./select";
+export * from "./label-tag";
