@@ -31,7 +31,7 @@ import { formatCount } from "@/shared/lib/utils";
 import { FeatureRequest } from "@/shared/types";
 
 export default function ProfilePage() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
 
   // Get user data
   const {
@@ -42,10 +42,26 @@ export default function ProfilePage() {
   } = useUserStats(user?.uid || "");
 
   const {
-    data: userFeatureRequests = [],
+    data: featureRequestsData,
     isLoading: featureRequestsLoading,
     error: featureRequestsError,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
   } = useUserFeatureRequests(user?.uid || "");
+
+  if (loading) {
+    return (
+      <div className="container mx-auto py-8">
+        <div className="max-w-4xl mx-auto text-center">
+          <h1 className="text-2xl font-bold mb-4">Loading...</h1>
+          <p className="text-muted-foreground">
+            Please wait while we load your profile.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   if (!user) {
     return (
@@ -72,6 +88,10 @@ export default function ProfilePage() {
   const handleFeatureRequestClick = (featureRequest: FeatureRequest) => {
     window.location.href = `/feature-requests/${featureRequest.id}`;
   };
+
+  // Flatten all feature requests from all pages
+  const allFeatureRequests =
+    featureRequestsData?.pages.flatMap((page) => page.featureRequests) || [];
 
   return (
     <div className="container mx-auto py-8">
@@ -165,7 +185,7 @@ export default function ProfilePage() {
         {/* Content Tabs */}
         <Card>
           <CardHeader>
-            <CardTitle>My Activity</CardTitle>
+            <CardTitle>My Feature Requests</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="mt-6">
@@ -190,7 +210,7 @@ export default function ProfilePage() {
                     Try Again
                   </Button>
                 </div>
-              ) : userFeatureRequests.length === 0 ? (
+              ) : allFeatureRequests.length === 0 ? (
                 <div className="text-center py-12">
                   <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                   <p className="text-muted-foreground mb-4">
@@ -203,15 +223,38 @@ export default function ProfilePage() {
                   </Button>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {userFeatureRequests.map((featureRequest) => (
-                    <FeatureRequestCard
-                      key={featureRequest.id}
-                      featureRequest={featureRequest}
-                      onClick={handleFeatureRequestClick}
-                      showActions={false}
-                    />
-                  ))}
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {allFeatureRequests.map((featureRequest) => (
+                      <FeatureRequestCard
+                        key={featureRequest.id}
+                        featureRequest={featureRequest}
+                        onClick={handleFeatureRequestClick}
+                        showActions={false}
+                      />
+                    ))}
+                  </div>
+
+                  {/* Load More Button */}
+                  {hasNextPage && (
+                    <div className="flex justify-center mt-8">
+                      <Button
+                        onClick={() => fetchNextPage()}
+                        disabled={isFetchingNextPage}
+                        variant="outline"
+                        className="flex items-center gap-2"
+                      >
+                        {isFetchingNextPage ? (
+                          <>
+                            <RefreshCw className="h-4 w-4 animate-spin" />
+                            Loading...
+                          </>
+                        ) : (
+                          "Load More"
+                        )}
+                      </Button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

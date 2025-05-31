@@ -10,6 +10,8 @@ import {
   serverTimestamp,
   orderBy,
   Timestamp,
+  limit,
+  startAfter,
 } from "firebase/firestore";
 import { db } from "@/shared/config/firebase";
 import { COLLECTIONS } from "@/shared/config/constants";
@@ -165,29 +167,62 @@ export async function getAdminEmails(): Promise<string[]> {
     .map((doc) => doc.data().email);
 }
 
-// Get user's feature requests
+// Get user's feature requests with pagination
 export async function getUserFeatureRequests(
-  userId: string
-): Promise<FeatureRequest[]> {
+  userId: string,
+  limitCount: number = 12,
+  lastDoc?: any
+): Promise<{
+  featureRequests: FeatureRequest[];
+  hasMore: boolean;
+  lastDoc?: any;
+}> {
   try {
     const featureRequestsRef = collection(db, COLLECTIONS.FEATURE_REQUESTS);
-    const q = query(
+    let q = query(
       featureRequestsRef,
       where("authorId", "==", userId),
-      orderBy("createdAt", "desc")
+      orderBy("createdAt", "desc"),
+      limit(limitCount + 1) // Request one extra to check if there are more
     );
+
+    // Add cursor for pagination
+    if (lastDoc) {
+      q = query(q, startAfter(lastDoc));
+    }
 
     const querySnapshot = await getDocs(q);
     const featureRequests: FeatureRequest[] = [];
+    const docs: any[] = [];
 
     querySnapshot.forEach((doc) => {
       featureRequests.push(convertFirestoreDoc(doc));
+      docs.push(doc);
     });
 
-    return featureRequests;
+    // Check if there are more documents
+    const hasMore = featureRequests.length > limitCount;
+
+    // Remove the extra document if it exists
+    if (hasMore) {
+      featureRequests.pop();
+      docs.pop();
+    }
+
+    // Get the last document for next page cursor
+    const lastDocument = docs.length > 0 ? docs[docs.length - 1] : undefined;
+
+    return {
+      featureRequests,
+      hasMore,
+      lastDoc: lastDocument,
+    };
   } catch (error) {
     console.error("Error getting user feature requests:", error);
-    return [];
+    return {
+      featureRequests: [],
+      hasMore: false,
+    };
   }
 }
 

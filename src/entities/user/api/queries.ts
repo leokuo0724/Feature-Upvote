@@ -1,4 +1,9 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  useInfiniteQuery,
+} from "@tanstack/react-query";
 import {
   getUser,
   createUser,
@@ -66,13 +71,18 @@ export function useUserDetails(uid: string) {
   });
 }
 
-// Get user's feature requests
+// Get user's feature requests with infinite pagination
 export function useUserFeatureRequests(userId: string) {
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: userKeys.featureRequests(userId),
-    queryFn: () => getUserFeatureRequests(userId),
+    queryFn: ({ pageParam }: { pageParam: any }) =>
+      getUserFeatureRequests(userId, 12, pageParam),
     enabled: !!userId,
     staleTime: 2 * 60 * 1000, // 2 minutes
+    initialPageParam: undefined as any,
+    getNextPageParam: (lastPage) => {
+      return lastPage.hasMore ? lastPage.lastDoc : undefined;
+    },
   });
 }
 
