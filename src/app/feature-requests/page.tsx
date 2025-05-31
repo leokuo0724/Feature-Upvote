@@ -111,9 +111,9 @@ function FeatureRequestsContent() {
     useState<FeatureRequest | null>(null);
   const [sortBy, setSortBy] = useState<string>("upvotes");
 
-  // Get tab group from URL or default to "all"
+  // Get tab group from URL or default to "open"
   const tabFromUrl = searchParams.get("tab") as TabGroup | null;
-  const [activeTab, setActiveTab] = useState<TabGroup>(tabFromUrl || "all");
+  const [activeTab, setActiveTab] = useState<TabGroup>(tabFromUrl || "open");
 
   // Get tab counts
   const { data: tabCounts = { all: 0, open: 0, "in-progress": 0, done: 0 } } =
