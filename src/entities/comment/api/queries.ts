@@ -82,6 +82,7 @@ export function useCommentCount(featureRequestId: string) {
 // Mutations
 export function useCreateComment() {
   const queryClient = useQueryClient();
+  const incrementCommentCount = useIncrementCommentCount();
 
   return useMutation({
     mutationFn: ({
@@ -99,21 +100,12 @@ export function useCreateComment() {
     }) =>
       createComment(data, authorId, authorName, authorEmail, authorPhotoURL),
     onSuccess: async (_, { data }) => {
+      // Increment comment count in feature request
+      await incrementCommentCount.mutateAsync(data.featureRequestId);
+
       // Invalidate comments for this feature request
       queryClient.invalidateQueries({
         queryKey: commentKeys.list({ featureRequestId: data.featureRequestId }),
-      });
-      // Invalidate comment count
-      queryClient.invalidateQueries({
-        queryKey: commentKeys.count(data.featureRequestId),
-      });
-
-      // Invalidate feature request lists to update comment count display
-      queryClient.invalidateQueries({
-        queryKey: ["featureRequests", "list"],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["featureRequests", "detail", data.featureRequestId],
       });
 
       toast({
@@ -160,6 +152,7 @@ export function useUpdateComment() {
 
 export function useDeleteComment() {
   const queryClient = useQueryClient();
+  const decrementCommentCount = useDecrementCommentCount();
 
   return useMutation({
     mutationFn: ({
@@ -170,22 +163,13 @@ export function useDeleteComment() {
       featureRequestId: string;
     }) => deleteComment(id),
     onSuccess: async (_, { id, featureRequestId }) => {
+      // Decrement comment count in feature request
+      await decrementCommentCount.mutateAsync(featureRequestId);
+
       // Remove from cache and invalidate lists
       queryClient.removeQueries({ queryKey: commentKeys.detail(id) });
       queryClient.invalidateQueries({
         queryKey: commentKeys.list({ featureRequestId }),
-      });
-      // Invalidate comment count
-      queryClient.invalidateQueries({
-        queryKey: commentKeys.count(featureRequestId),
-      });
-
-      // Invalidate feature request lists to update comment count display
-      queryClient.invalidateQueries({
-        queryKey: ["featureRequests", "list"],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["featureRequests", "detail", featureRequestId],
       });
 
       toast({

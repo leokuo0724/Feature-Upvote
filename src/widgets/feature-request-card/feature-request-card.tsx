@@ -40,7 +40,6 @@ import {
 } from "@/entities/feature-request";
 import { formatCount, truncateText } from "@/shared/lib/utils";
 import { useToast } from "@/shared/ui";
-import { useCommentCount } from "@/entities/comment";
 
 interface FeatureRequestCardProps {
   featureRequest: FeatureRequest;
@@ -72,7 +71,6 @@ export function FeatureRequestCard({
   const updateFeatureRequest = useUpdateFeatureRequest();
   const { toast } = useToast();
   const [isUpvoting, setIsUpvoting] = useState(false);
-  const { data: commentCount = 0 } = useCommentCount(featureRequest.id);
 
   const hasUpvoted = user ? featureRequest.upvotedBy.includes(user.uid) : false;
   const canEdit =
@@ -211,7 +209,7 @@ export function FeatureRequestCard({
             <div className="flex items-center gap-3 text-sm text-muted-foreground min-w-0">
               <div className="flex items-center gap-1">
                 <MessageCircle className="h-4 w-4" />
-                <span>{formatCount(commentCount)}</span>
+                <span>{formatCount(featureRequest.commentsCount)}</span>
               </div>
 
               <div className="flex items-center gap-1 min-w-0 flex-1 text-xs sm:text-sm">
