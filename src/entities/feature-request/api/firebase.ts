@@ -208,16 +208,32 @@ export async function getFeatureRequests(
   hasMore: boolean;
   lastDoc?: QueryDocumentSnapshot<DocumentData>;
 }> {
-  const q = buildQuery(queryParams);
-  const querySnapshot = await getDocs(q);
+  const requestedLimit = queryParams.limit || 10;
 
-  const featureRequests: FeatureRequest[] = [];
-  querySnapshot.forEach((doc) => {
-    featureRequests.push(convertFirestoreDoc(doc));
+  // Request one extra document to check if there are more pages
+  const q = buildQuery({
+    ...queryParams,
+    limit: requestedLimit + 1,
   });
 
-  const hasMore = querySnapshot.docs.length === (queryParams.limit || 10);
-  const lastDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
+  const querySnapshot = await getDocs(q);
+
+  const allDocs: FeatureRequest[] = [];
+  querySnapshot.forEach((doc) => {
+    allDocs.push(convertFirestoreDoc(doc));
+  });
+
+  // Check if we have more than the requested limit
+  const hasMore = allDocs.length > requestedLimit;
+
+  // Return only the requested number of documents
+  const featureRequests = hasMore ? allDocs.slice(0, requestedLimit) : allDocs;
+
+  // Get the last document for the next page cursor
+  const lastDoc =
+    featureRequests.length > 0
+      ? querySnapshot.docs[featureRequests.length - 1]
+      : undefined;
 
   return {
     featureRequests,
@@ -236,7 +252,13 @@ export async function getFeatureRequestsWithCursor(
   lastDoc?: QueryDocumentSnapshot<DocumentData>;
 }> {
   try {
-    let q = buildQuery(queryParams);
+    const requestedLimit = queryParams.limit || 10;
+
+    // Request one extra document to check if there are more pages
+    let q = buildQuery({
+      ...queryParams,
+      limit: requestedLimit + 1,
+    });
 
     // Add cursor for pagination
     if (lastDoc) {
@@ -245,14 +267,25 @@ export async function getFeatureRequestsWithCursor(
 
     const querySnapshot = await getDocs(q);
 
-    const featureRequests: FeatureRequest[] = [];
+    const allDocs: FeatureRequest[] = [];
     querySnapshot.forEach((doc) => {
       const data = doc.data();
-      featureRequests.push(convertFirestoreDoc(data, doc.id));
+      allDocs.push(convertFirestoreDoc(data, doc.id));
     });
 
-    const hasMore = querySnapshot.docs.length === (queryParams.limit || 10);
-    const newLastDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
+    // Check if we have more than the requested limit
+    const hasMore = allDocs.length > requestedLimit;
+
+    // Return only the requested number of documents
+    const featureRequests = hasMore
+      ? allDocs.slice(0, requestedLimit)
+      : allDocs;
+
+    // Get the last document for the next page cursor
+    const newLastDoc =
+      featureRequests.length > 0
+        ? querySnapshot.docs[featureRequests.length - 1]
+        : undefined;
 
     return {
       featureRequests,
