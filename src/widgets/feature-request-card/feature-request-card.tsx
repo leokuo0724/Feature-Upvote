@@ -52,11 +52,11 @@ interface FeatureRequestCardProps {
 
 const statusColors = {
   Open: "default",
-  "In Progress": "info",
+  "In Progress": "warning",
   Completed: "success",
-  "Won't Do": "destructive",
-  Considering: "secondary",
-  "Will Do": "success",
+  "Won't Do": "deprecated",
+  Considering: "info1",
+  "Will Do": "info2",
 } as const;
 
 export function FeatureRequestCard({
@@ -205,18 +205,17 @@ export function FeatureRequestCard({
             ))}
           </div>
         </CardContent>
-        <CardFooter className="pt-3 border-t bg-muted/20">
-          <div className="flex items-center justify-between w-full">
-            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+        <CardFooter className="pt-3 border-t bg-muted/50">
+          <div className="flex items-center justify-between w-full gap-2">
+            <div className="flex items-center gap-3 text-sm text-muted-foreground min-w-0">
               <div className="flex items-center gap-1">
                 <MessageCircle className="h-4 w-4" />
                 <span>{formatCount(commentCount)}</span>
               </div>
 
-              <div className="flex items-center gap-1">
-                <span>by {featureRequest.authorName}</span>
-                <span>•</span>
-                <span>
+              <div className="flex items-center gap-1 min-w-0 flex-1 text-xs sm:text-sm">
+                <span className="truncate">
+                  by {featureRequest.authorName} •{" "}
                   {formatDistanceToNow(featureRequest.createdAt, {
                     addSuffix: true,
                   })}
