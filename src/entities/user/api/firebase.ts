@@ -220,41 +220,31 @@ export async function getUserVotedFeatureRequests(
 // Get user statistics
 export async function getUserStats(userId: string): Promise<{
   featureRequestsCount: number;
-  totalUpvotesReceived: number;
   commentsCount: number;
-  votesGiven: number;
 }> {
   try {
-    // Get user's feature requests
-    const userFeatureRequests = await getUserFeatureRequests(userId);
-
-    // Calculate total upvotes received
-    const totalUpvotesReceived = userFeatureRequests.reduce(
-      (total, fr) => total + fr.upvotes,
-      0
+    // Get user's feature requests count
+    const featureRequestsRef = collection(db, COLLECTIONS.FEATURE_REQUESTS);
+    const featureRequestsQuery = query(
+      featureRequestsRef,
+      where("authorId", "==", userId)
     );
+    const featureRequestsSnapshot = await getDocs(featureRequestsQuery);
 
     // Get comments count
     const commentsRef = collection(db, COLLECTIONS.COMMENTS);
     const commentsQuery = query(commentsRef, where("authorId", "==", userId));
     const commentsSnapshot = await getDocs(commentsQuery);
 
-    // Get votes given count
-    const votedFeatureRequests = await getUserVotedFeatureRequests(userId);
-
     return {
-      featureRequestsCount: userFeatureRequests.length,
-      totalUpvotesReceived,
+      featureRequestsCount: featureRequestsSnapshot.size,
       commentsCount: commentsSnapshot.size,
-      votesGiven: votedFeatureRequests.length,
     };
   } catch (error) {
     console.error("Error getting user stats:", error);
     return {
       featureRequestsCount: 0,
-      totalUpvotesReceived: 0,
       commentsCount: 0,
-      votesGiven: 0,
     };
   }
 }

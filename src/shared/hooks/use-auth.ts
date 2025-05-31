@@ -10,14 +10,25 @@ import {
 } from "firebase/auth";
 import { auth } from "@/shared/config/firebase";
 import { User } from "@/shared/types";
-import { useIsAdmin, useUpsertUserOnLogin } from "@/entities/user/api/queries";
+import {
+  useIsAdmin,
+  useUpsertUserOnLogin,
+  useUser,
+} from "@/entities/user/api/queries";
 
 export function useAuth() {
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Check if user is admin
-  const { data: isAdmin = false } = useIsAdmin(firebaseUser?.email || null);
+  // Get user data from Firestore
+  const { data: firestoreUser, isLoading: firestoreLoading } = useUser(
+    firebaseUser?.uid || null
+  );
+
+  // Check if user is admin (fallback if Firestore data not available)
+  const { data: isAdminFallback = false } = useIsAdmin(
+    firebaseUser?.email || null
+  );
 
   // Mutation to upsert user in Firestore on login
   const upsertUserMutation = useUpsertUserOnLogin();
@@ -71,19 +82,24 @@ export function useAuth() {
     }
   };
 
-  // Construct the user object
+  // Construct the user object using Firestore data when available
   const user: User | null = firebaseUser
-    ? {
+    ? firestoreUser || {
         uid: firebaseUser.uid,
         email: firebaseUser.email,
         displayName: firebaseUser.displayName,
         photoURL: firebaseUser.photoURL,
-        isAdmin,
-        createdAt: new Date(), // This will be overridden by Firestore data
-        updatedAt: new Date(), // This will be overridden by Firestore data
-        lastLoginAt: new Date(), // This will be overridden by Firestore data
+        isAdmin: isAdminFallback,
+        createdAt: new Date(), // Fallback - will be replaced when Firestore data loads
+        updatedAt: new Date(), // Fallback - will be replaced when Firestore data loads
+        lastLoginAt: new Date(), // Fallback - will be replaced when Firestore data loads
       }
     : null;
 
-  return { user, loading, signIn, signOut };
+  return {
+    user,
+    loading: loading || (firebaseUser && firestoreLoading),
+    signIn,
+    signOut,
+  };
 }

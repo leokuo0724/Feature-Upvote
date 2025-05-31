@@ -1,13 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { formatDistanceToNow } from "date-fns";
 import {
   User,
   Calendar,
-  ThumbsUp,
   FileText,
-  MessageCircle,
   Crown,
   Settings,
   RefreshCw,
@@ -19,10 +17,6 @@ import {
   CardTitle,
   Badge,
   Button,
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
   Avatar,
   AvatarFallback,
   AvatarImage,
@@ -32,14 +26,12 @@ import { FeatureRequestCard } from "@/widgets/feature-request-card";
 import {
   useUserStats,
   useUserFeatureRequests,
-  useUserVotedFeatureRequests,
 } from "@/entities/user/api/queries";
 import { formatCount } from "@/shared/lib/utils";
 import { FeatureRequest } from "@/shared/types";
 
 export default function ProfilePage() {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState("my-requests");
 
   // Get user data
   const {
@@ -54,12 +46,6 @@ export default function ProfilePage() {
     isLoading: featureRequestsLoading,
     error: featureRequestsError,
   } = useUserFeatureRequests(user?.uid || "");
-
-  const {
-    data: votedFeatureRequests = [],
-    isLoading: votedRequestsLoading,
-    error: votedRequestsError,
-  } = useUserVotedFeatureRequests(user?.uid || "");
 
   if (!user) {
     return (
@@ -135,17 +121,12 @@ export default function ProfilePage() {
                   </div>
                 </div>
               </div>
-
-              <Button variant="outline" className="flex items-center gap-2">
-                <Settings className="h-4 w-4" />
-                Edit Profile
-              </Button>
             </div>
           </CardHeader>
         </Card>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Card>
             <CardContent className="pt-4">
               <div className="text-center">
@@ -157,38 +138,10 @@ export default function ProfilePage() {
                       formatCount(userStats?.featureRequestsCount || 0)
                     )}
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-6 w-6 p-0"
-                    onClick={() => refetchStats()}
-                    disabled={statsLoading}
-                  >
-                    <RefreshCw
-                      className={`h-3 w-3 ${
-                        statsLoading ? "animate-spin" : ""
-                      }`}
-                    />
-                  </Button>
                 </div>
                 <p className="text-sm text-muted-foreground">
                   Feature Requests
                 </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="pt-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-primary mb-1">
-                  {statsLoading ? (
-                    <div className="animate-pulse bg-muted h-8 w-12 rounded mx-auto"></div>
-                  ) : (
-                    formatCount(userStats?.totalUpvotesReceived || 0)
-                  )}
-                </div>
-                <p className="text-sm text-muted-foreground">Total Upvotes</p>
               </div>
             </CardContent>
           </Card>
@@ -207,21 +160,6 @@ export default function ProfilePage() {
               </div>
             </CardContent>
           </Card>
-
-          <Card>
-            <CardContent className="pt-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-primary mb-1">
-                  {statsLoading ? (
-                    <div className="animate-pulse bg-muted h-8 w-8 rounded mx-auto"></div>
-                  ) : (
-                    formatCount(userStats?.votesGiven || 0)
-                  )}
-                </div>
-                <p className="text-sm text-muted-foreground">Votes Given</p>
-              </div>
-            </CardContent>
-          </Card>
         </div>
 
         {/* Content Tabs */}
@@ -230,116 +168,53 @@ export default function ProfilePage() {
             <CardTitle>My Activity</CardTitle>
           </CardHeader>
           <CardContent>
-            <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="my-requests">
-                  My Feature Requests ({userStats?.featureRequestsCount || 0})
-                </TabsTrigger>
-                <TabsTrigger value="my-votes">
-                  My Votes ({userStats?.votesGiven || 0})
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="my-requests" className="mt-6">
-                {featureRequestsLoading ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {Array.from({ length: 4 }).map((_, i) => (
-                      <div
-                        key={i}
-                        className="h-48 bg-muted animate-pulse rounded-lg"
-                      />
-                    ))}
-                  </div>
-                ) : featureRequestsError ? (
-                  <div className="text-center py-12">
-                    <p className="text-destructive mb-4">
-                      Error loading your feature requests
-                    </p>
-                    <Button
-                      variant="outline"
-                      onClick={() => window.location.reload()}
-                    >
-                      Try Again
-                    </Button>
-                  </div>
-                ) : userFeatureRequests.length === 0 ? (
-                  <div className="text-center py-12">
-                    <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground mb-4">
-                      You haven't created any feature requests yet.
-                    </p>
-                    <Button
-                      onClick={() =>
-                        (window.location.href = "/feature-requests")
-                      }
-                    >
-                      Create Your First Request
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {userFeatureRequests.map((featureRequest) => (
-                      <FeatureRequestCard
-                        key={featureRequest.id}
-                        featureRequest={featureRequest}
-                        onClick={handleFeatureRequestClick}
-                        showActions={false}
-                      />
-                    ))}
-                  </div>
-                )}
-              </TabsContent>
-
-              <TabsContent value="my-votes" className="mt-6">
-                {votedRequestsLoading ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {Array.from({ length: 4 }).map((_, i) => (
-                      <div
-                        key={i}
-                        className="h-48 bg-muted animate-pulse rounded-lg"
-                      />
-                    ))}
-                  </div>
-                ) : votedRequestsError ? (
-                  <div className="text-center py-12">
-                    <p className="text-destructive mb-4">
-                      Error loading your voted requests
-                    </p>
-                    <Button
-                      variant="outline"
-                      onClick={() => window.location.reload()}
-                    >
-                      Try Again
-                    </Button>
-                  </div>
-                ) : votedFeatureRequests.length === 0 ? (
-                  <div className="text-center py-12">
-                    <ThumbsUp className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground mb-4">
-                      You haven't voted on any feature requests yet.
-                    </p>
-                    <Button
-                      onClick={() =>
-                        (window.location.href = "/feature-requests")
-                      }
-                    >
-                      Explore Feature Requests
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {votedFeatureRequests.map((featureRequest) => (
-                      <FeatureRequestCard
-                        key={featureRequest.id}
-                        featureRequest={featureRequest}
-                        onClick={handleFeatureRequestClick}
-                        showActions={false}
-                      />
-                    ))}
-                  </div>
-                )}
-              </TabsContent>
-            </Tabs>
+            <div className="mt-6">
+              {featureRequestsLoading ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="h-48 bg-muted animate-pulse rounded-lg"
+                    />
+                  ))}
+                </div>
+              ) : featureRequestsError ? (
+                <div className="text-center py-12">
+                  <p className="text-destructive mb-4">
+                    Error loading your feature requests
+                  </p>
+                  <Button
+                    variant="outline"
+                    onClick={() => window.location.reload()}
+                  >
+                    Try Again
+                  </Button>
+                </div>
+              ) : userFeatureRequests.length === 0 ? (
+                <div className="text-center py-12">
+                  <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground mb-4">
+                    You haven't created any feature requests yet.
+                  </p>
+                  <Button
+                    onClick={() => (window.location.href = "/feature-requests")}
+                  >
+                    Create Your First Request
+                  </Button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {userFeatureRequests.map((featureRequest) => (
+                    <FeatureRequestCard
+                      key={featureRequest.id}
+                      featureRequest={featureRequest}
+                      onClick={handleFeatureRequestClick}
+                      showActions={false}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
           </CardContent>
         </Card>
       </div>
