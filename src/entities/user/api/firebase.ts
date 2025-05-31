@@ -14,14 +14,40 @@ import { COLLECTIONS } from "@/shared/config/constants";
 import { User } from "@/shared/types";
 
 export async function createUser(
-  userData: Omit<User, "createdAt" | "updatedAt">
+  userData: Omit<User, "createdAt" | "updatedAt" | "lastLoginAt">
 ): Promise<void> {
   const userRef = doc(db, COLLECTIONS.USERS, userData.uid);
   await setDoc(userRef, {
     ...userData,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
+    lastLoginAt: serverTimestamp(),
   });
+}
+
+export async function upsertUserOnLogin(
+  userData: Omit<User, "createdAt" | "updatedAt" | "lastLoginAt" | "isAdmin">
+): Promise<void> {
+  const userRef = doc(db, COLLECTIONS.USERS, userData.uid);
+  const userSnap = await getDoc(userRef);
+
+  if (userSnap.exists()) {
+    await updateDoc(userRef, {
+      email: userData.email,
+      displayName: userData.displayName,
+      photoURL: userData.photoURL,
+      lastLoginAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
+  } else {
+    await setDoc(userRef, {
+      ...userData,
+      isAdmin: false,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      lastLoginAt: serverTimestamp(),
+    });
+  }
 }
 
 export async function getUser(uid: string): Promise<User | null> {
@@ -69,7 +95,6 @@ export async function addAdminEmail(
 export async function removeAdminEmail(email: string): Promise<void> {
   const adminEmailRef = doc(db, COLLECTIONS.ADMIN_EMAILS, email);
   await updateDoc(adminEmailRef, {
-    // Firestore doesn't have a direct delete field, so we'll use a flag
     deletedAt: serverTimestamp(),
   });
 }
@@ -79,6 +104,6 @@ export async function getAdminEmails(): Promise<string[]> {
   const querySnapshot = await getDocs(q);
 
   return querySnapshot.docs
-    .filter((doc) => !doc.data().deletedAt) // Filter out deleted emails
+    .filter((doc) => !doc.data().deletedAt)
     .map((doc) => doc.data().email);
 }

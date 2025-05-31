@@ -10,7 +10,7 @@ import {
 } from "firebase/auth";
 import { auth } from "@/shared/config/firebase";
 import { User } from "@/shared/types";
-import { useIsAdmin, useCreateUser } from "@/entities/user/api/queries";
+import { useIsAdmin, useUpsertUserOnLogin } from "@/entities/user/api/queries";
 
 export function useAuth() {
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
@@ -19,8 +19,8 @@ export function useAuth() {
   // Check if user is admin
   const { data: isAdmin = false } = useIsAdmin(firebaseUser?.email || null);
 
-  // Mutation to create user in Firestore
-  const createUserMutation = useCreateUser();
+  // Mutation to upsert user in Firestore on login
+  const upsertUserMutation = useUpsertUserOnLogin();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(
@@ -29,18 +29,16 @@ export function useAuth() {
         setFirebaseUser(user);
 
         if (user) {
-          // Create user in Firestore if it doesn't exist
+          // Upsert user in Firestore (create if new, update lastLoginAt if existing)
           try {
-            await createUserMutation.mutateAsync({
+            await upsertUserMutation.mutateAsync({
               uid: user.uid,
               email: user.email,
               displayName: user.displayName,
               photoURL: user.photoURL,
-              isAdmin: false, // Will be updated by the admin check
             });
           } catch (error) {
-            // User might already exist, that's okay
-            console.log("User already exists or error creating user:", error);
+            console.error("Error upserting user:", error);
           }
         }
 
@@ -83,6 +81,7 @@ export function useAuth() {
         isAdmin,
         createdAt: new Date(), // This will be overridden by Firestore data
         updatedAt: new Date(), // This will be overridden by Firestore data
+        lastLoginAt: new Date(), // This will be overridden by Firestore data
       }
     : null;
 

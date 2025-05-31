@@ -35,4 +35,5 @@ export const COLLECTIONS = {
   COMMENTS: "comments",
   ADMIN_EMAILS: "adminEmails",
   LABELS: "labels",
+  ANALYTICS: "analytics",
 } as const;

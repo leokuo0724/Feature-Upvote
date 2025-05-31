@@ -3,6 +3,7 @@ import {
   getUser,
   createUser,
   updateUser,
+  upsertUserOnLogin,
   checkIsAdmin,
   addAdminEmail,
   removeAdminEmail,
@@ -24,6 +25,7 @@ export function useUser(uid: string | null) {
     queryKey: userKeys.user(uid || ""),
     queryFn: () => getUser(uid!),
     enabled: !!uid,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 }
 
@@ -63,6 +65,27 @@ export function useCreateUser() {
   });
 }
 
+// 新增：用於登入時的 upsert mutation
+export function useUpsertUserOnLogin() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: upsertUserOnLogin,
+    onSuccess: (_, userData) => {
+      // Invalidate user cache to refetch updated data
+      queryClient.invalidateQueries({
+        queryKey: userKeys.user(userData.uid),
+      });
+      // Invalidate admin status if email is provided
+      if (userData.email) {
+        queryClient.invalidateQueries({
+          queryKey: userKeys.isAdmin(userData.email),
+        });
+      }
+    },
+  });
+}
+
 export function useUpdateUser() {
   const queryClient = useQueryClient();
 
@@ -84,11 +107,8 @@ export function useAddAdminEmail() {
   return useMutation({
     mutationFn: ({ email, addedBy }: { email: string; addedBy: string }) =>
       addAdminEmail(email, addedBy),
-    onSuccess: (_, { email }) => {
-      // Invalidate admin emails list
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: userKeys.adminEmails() });
-      // Invalidate admin status for this email
-      queryClient.invalidateQueries({ queryKey: userKeys.isAdmin(email) });
     },
   });
 }
@@ -98,11 +118,8 @@ export function useRemoveAdminEmail() {
 
   return useMutation({
     mutationFn: removeAdminEmail,
-    onSuccess: (_, email) => {
-      // Invalidate admin emails list
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: userKeys.adminEmails() });
-      // Invalidate admin status for this email
-      queryClient.invalidateQueries({ queryKey: userKeys.isAdmin(email) });
     },
   });
 }

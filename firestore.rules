@@ -43,6 +43,12 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // Analytics collection
+    match /analytics/{analyticsId} {
+      // Only admins can read/write analytics data
+      allow read, write: if isAdmin();
+    }
+
     // Feature requests collection
     match /featureRequests/{requestId} {
       // Anyone can read feature requests

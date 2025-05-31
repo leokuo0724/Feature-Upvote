@@ -1,15 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { Settings, Tag, Users, BarChart3 } from "lucide-react";
+import { Settings, Tag, Users, BarChart3, RefreshCw } from "lucide-react";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
+  Button,
 } from "@/shared/ui";
 import { useAuth } from "@/shared/hooks/use-auth";
+import {
+  useActiveUsers,
+  useTotalFeatureRequests,
+  useTotalComments,
+} from "@/entities/analytics";
 
 const adminFeatures = [
   {
@@ -49,8 +55,83 @@ const adminFeatures = [
   },
 ];
 
+interface StatCardProps {
+  title: string;
+  value: number | undefined;
+  isLoading: boolean;
+  error: Error | null;
+  onRefresh?: () => void;
+}
+
+function StatCard({
+  title,
+  value,
+  isLoading,
+  error,
+  onRefresh,
+}: StatCardProps) {
+  return (
+    <Card>
+      <CardContent className="pt-6">
+        <div className="text-center">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <div className="text-2xl font-bold text-primary">
+              {isLoading ? (
+                <div className="animate-pulse bg-muted h-8 w-16 rounded mx-auto"></div>
+              ) : error ? (
+                "Error"
+              ) : (
+                value?.toLocaleString() || "0"
+              )}
+            </div>
+            {onRefresh && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 w-6 p-0"
+                onClick={onRefresh}
+                disabled={isLoading}
+              >
+                <RefreshCw
+                  className={`h-3 w-3 ${isLoading ? "animate-spin" : ""}`}
+                />
+              </Button>
+            )}
+          </div>
+          <p className="text-sm text-muted-foreground">{title}</p>
+          {error && (
+            <p className="text-xs text-destructive mt-1">Failed to load</p>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function AdminPage() {
   const { user } = useAuth();
+
+  // Analytics queries
+  const {
+    data: activeUsers,
+    isLoading: activeUsersLoading,
+    error: activeUsersError,
+    refetch: refetchActiveUsers,
+  } = useActiveUsers("monthly");
+
+  const {
+    data: totalFeatureRequests,
+    isLoading: featureRequestsLoading,
+    error: featureRequestsError,
+    refetch: refetchFeatureRequests,
+  } = useTotalFeatureRequests();
+
+  const {
+    data: totalComments,
+    isLoading: commentsLoading,
+    error: commentsError,
+    refetch: refetchComments,
+  } = useTotalComments();
 
   // Redirect if not admin
   if (user && !user.isAdmin) {
@@ -156,34 +237,29 @@ export default function AdminPage() {
 
         {/* Quick Stats */}
         <div className="mt-12">
-          <h2 className="text-xl font-semibold mb-4">Quick Overview</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card>
-              <CardContent className="pt-6">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-primary">-</div>
-                  <p className="text-sm text-muted-foreground">
-                    Total Feature Requests
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-6">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-primary">-</div>
-                  <p className="text-sm text-muted-foreground">Active Users</p>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-6">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-primary">-</div>
-                  <p className="text-sm text-muted-foreground">Total Labels</p>
-                </div>
-              </CardContent>
-            </Card>
+          <h2 className="text-xl font-semibold mb-4">Platform Overview</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <StatCard
+              title="Active Users (30 Days)"
+              value={activeUsers}
+              isLoading={activeUsersLoading}
+              error={activeUsersError}
+              onRefresh={() => refetchActiveUsers()}
+            />
+            <StatCard
+              title="Total Feature Requests"
+              value={totalFeatureRequests}
+              isLoading={featureRequestsLoading}
+              error={featureRequestsError}
+              onRefresh={() => refetchFeatureRequests()}
+            />
+            <StatCard
+              title="Total Comments"
+              value={totalComments}
+              isLoading={commentsLoading}
+              error={commentsError}
+              onRefresh={() => refetchComments()}
+            />
           </div>
         </div>
       </div>

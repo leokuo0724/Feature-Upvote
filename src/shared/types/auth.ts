@@ -6,6 +6,7 @@ export interface User {
   isAdmin: boolean;
   createdAt: Date;
   updatedAt: Date;
+  lastLoginAt: Date;
 }
 
 export interface AuthState {
