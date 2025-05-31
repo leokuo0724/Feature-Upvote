@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -34,6 +34,67 @@ const settingsSchema = z.object({
 
 type SettingsFormData = z.infer<typeof settingsSchema>;
 
+// Custom ColorPicker component that auto-saves on outside click
+interface ColorPickerProps {
+  value: string;
+  onChange: (value: string) => void;
+  className?: string;
+}
+
+function ColorPicker({ value, onChange, className }: ColorPickerProps) {
+  const colorInputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isColorPickerOpen, setIsColorPickerOpen] = useState(false);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node) &&
+        isColorPickerOpen
+      ) {
+        setIsColorPickerOpen(false);
+      }
+    }
+
+    if (isColorPickerOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    }
+  }, [isColorPickerOpen]);
+
+  const handleColorInputClick = () => {
+    setIsColorPickerOpen(true);
+  };
+
+  const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onChange(e.target.value);
+  };
+
+  return (
+    <div ref={containerRef} className={className}>
+      <div className="flex items-center gap-2">
+        <Input
+          ref={colorInputRef}
+          type="color"
+          value={value}
+          onChange={handleColorChange}
+          onClick={handleColorInputClick}
+          className="w-16 h-10 p-1 border rounded cursor-pointer"
+        />
+        <Input
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="#3b82f6"
+          className="flex-1"
+        />
+      </div>
+    </div>
+  );
+}
+
 export default function AdminSettingsPage() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("branding");
@@ -47,6 +108,7 @@ export default function AdminSettingsPage() {
     formState: { errors, isDirty },
     reset,
     watch,
+    setValue,
   } = useForm<SettingsFormData>({
     resolver: zodResolver(settingsSchema),
     defaultValues: {
@@ -83,6 +145,14 @@ export default function AdminSettingsPage() {
       console.error("Error updating settings:", error);
     } finally {
       setIsUpdating(false);
+    }
+  };
+
+  // Auto-save function for color picker
+  const handleColorAutoSave = async () => {
+    if (isDirty) {
+      const currentValues = watch();
+      await onSubmit(currentValues);
     }
   };
 
@@ -126,7 +196,7 @@ export default function AdminSettingsPage() {
 
         <form onSubmit={handleSubmit(onSubmit)}>
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="branding" className="flex items-center gap-2">
                 <Globe className="h-4 w-4" />
                 Branding
@@ -134,14 +204,6 @@ export default function AdminSettingsPage() {
               <TabsTrigger value="theme" className="flex items-center gap-2">
                 <Palette className="h-4 w-4" />
                 Theme
-              </TabsTrigger>
-              <TabsTrigger value="features" className="flex items-center gap-2">
-                <Flag className="h-4 w-4" />
-                Features
-              </TabsTrigger>
-              <TabsTrigger value="advanced" className="flex items-center gap-2">
-                <Settings className="h-4 w-4" />
-                Advanced
               </TabsTrigger>
             </TabsList>
 
@@ -192,34 +254,21 @@ export default function AdminSettingsPage() {
                   <div className="grid grid-cols-1 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="primaryColor">Primary Color</Label>
-                      <div className="flex items-center gap-2">
-                        <Input
-                          id="primaryColor"
-                          type="color"
-                          {...register("primaryColor")}
-                          className="w-16 h-10 p-1 border rounded"
-                        />
-                        <Input
-                          {...register("primaryColor")}
-                          placeholder="#3b82f6"
-                          className="flex-1"
-                        />
-                      </div>
+                      <ColorPicker
+                        value={primaryColor}
+                        onChange={(value) => {
+                          setValue("primaryColor", value, {
+                            shouldDirty: true,
+                            shouldValidate: true,
+                          });
+                        }}
+                        className="w-full"
+                      />
                       {errors.primaryColor && (
                         <p className="text-sm text-destructive">
                           {errors.primaryColor.message}
                         </p>
                       )}
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Color Preview</Label>
-                    <div className="flex gap-4 p-4 border rounded-lg">
-                      <div
-                        className="w-16 h-16 rounded-lg border"
-                        style={{ backgroundColor: primaryColor }}
-                      />
                     </div>
                   </div>
 
