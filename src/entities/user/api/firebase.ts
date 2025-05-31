@@ -8,10 +8,62 @@ import {
   where,
   getDocs,
   serverTimestamp,
+  orderBy,
+  Timestamp,
 } from "firebase/firestore";
 import { db } from "@/shared/config/firebase";
 import { COLLECTIONS } from "@/shared/config/constants";
-import { User } from "@/shared/types";
+import { User, FeatureRequest } from "@/shared/types";
+
+// Helper function to convert Firestore document data to User
+function convertFirestoreUserDoc(doc: any): User {
+  const data = doc.data();
+  return {
+    uid: doc.id,
+    email: data.email || "",
+    displayName: data.displayName || "",
+    photoURL: data.photoURL || "",
+    isAdmin: data.isAdmin || false,
+    createdAt:
+      data.createdAt instanceof Timestamp
+        ? data.createdAt.toDate()
+        : new Date(data.createdAt || Date.now()),
+    updatedAt:
+      data.updatedAt instanceof Timestamp
+        ? data.updatedAt.toDate()
+        : new Date(data.updatedAt || Date.now()),
+    lastLoginAt:
+      data.lastLoginAt instanceof Timestamp
+        ? data.lastLoginAt.toDate()
+        : new Date(data.lastLoginAt || Date.now()),
+  };
+}
+
+// Helper function to convert Firestore document data to FeatureRequest
+function convertFirestoreDoc(doc: any): FeatureRequest {
+  const data = doc.data();
+  return {
+    id: doc.id,
+    title: data.title || "",
+    description: data.description || "",
+    status: data.status || "Open",
+    upvotes: data.upvotes || 0,
+    upvotedBy: data.upvotedBy || [],
+    labels: data.labels || [],
+    authorId: data.authorId || "",
+    authorName: data.authorName || "",
+    authorEmail: data.authorEmail || "",
+    commentsCount: data.commentsCount || 0,
+    createdAt:
+      data.createdAt instanceof Timestamp
+        ? data.createdAt.toDate()
+        : new Date(data.createdAt || Date.now()),
+    updatedAt:
+      data.updatedAt instanceof Timestamp
+        ? data.updatedAt.toDate()
+        : new Date(data.updatedAt || Date.now()),
+  };
+}
 
 export async function createUser(
   userData: Omit<User, "createdAt" | "updatedAt" | "lastLoginAt">
@@ -51,13 +103,18 @@ export async function upsertUserOnLogin(
 }
 
 export async function getUser(uid: string): Promise<User | null> {
-  const userRef = doc(db, COLLECTIONS.USERS, uid);
-  const userSnap = await getDoc(userRef);
+  try {
+    const userRef = doc(db, COLLECTIONS.USERS, uid);
+    const userSnap = await getDoc(userRef);
 
-  if (userSnap.exists()) {
-    return { ...userSnap.data() } as User;
+    if (userSnap.exists()) {
+      return convertFirestoreUserDoc(userSnap);
+    }
+    return null;
+  } catch (error) {
+    console.error("Error getting user:", error);
+    return null;
   }
-  return null;
 }
 
 export async function updateUser(
@@ -106,4 +163,98 @@ export async function getAdminEmails(): Promise<string[]> {
   return querySnapshot.docs
     .filter((doc) => !doc.data().deletedAt)
     .map((doc) => doc.data().email);
+}
+
+// Get user's feature requests
+export async function getUserFeatureRequests(
+  userId: string
+): Promise<FeatureRequest[]> {
+  try {
+    const featureRequestsRef = collection(db, COLLECTIONS.FEATURE_REQUESTS);
+    const q = query(
+      featureRequestsRef,
+      where("authorId", "==", userId),
+      orderBy("createdAt", "desc")
+    );
+
+    const querySnapshot = await getDocs(q);
+    const featureRequests: FeatureRequest[] = [];
+
+    querySnapshot.forEach((doc) => {
+      featureRequests.push(convertFirestoreDoc(doc));
+    });
+
+    return featureRequests;
+  } catch (error) {
+    console.error("Error getting user feature requests:", error);
+    return [];
+  }
+}
+
+// Get feature requests user has voted on
+export async function getUserVotedFeatureRequests(
+  userId: string
+): Promise<FeatureRequest[]> {
+  try {
+    const featureRequestsRef = collection(db, COLLECTIONS.FEATURE_REQUESTS);
+    const q = query(
+      featureRequestsRef,
+      where("upvotedBy", "array-contains", userId),
+      orderBy("createdAt", "desc")
+    );
+
+    const querySnapshot = await getDocs(q);
+    const featureRequests: FeatureRequest[] = [];
+
+    querySnapshot.forEach((doc) => {
+      featureRequests.push(convertFirestoreDoc(doc));
+    });
+
+    return featureRequests;
+  } catch (error) {
+    console.error("Error getting user voted feature requests:", error);
+    return [];
+  }
+}
+
+// Get user statistics
+export async function getUserStats(userId: string): Promise<{
+  featureRequestsCount: number;
+  totalUpvotesReceived: number;
+  commentsCount: number;
+  votesGiven: number;
+}> {
+  try {
+    // Get user's feature requests
+    const userFeatureRequests = await getUserFeatureRequests(userId);
+
+    // Calculate total upvotes received
+    const totalUpvotesReceived = userFeatureRequests.reduce(
+      (total, fr) => total + fr.upvotes,
+      0
+    );
+
+    // Get comments count
+    const commentsRef = collection(db, COLLECTIONS.COMMENTS);
+    const commentsQuery = query(commentsRef, where("authorId", "==", userId));
+    const commentsSnapshot = await getDocs(commentsQuery);
+
+    // Get votes given count
+    const votedFeatureRequests = await getUserVotedFeatureRequests(userId);
+
+    return {
+      featureRequestsCount: userFeatureRequests.length,
+      totalUpvotesReceived,
+      commentsCount: commentsSnapshot.size,
+      votesGiven: votedFeatureRequests.length,
+    };
+  } catch (error) {
+    console.error("Error getting user stats:", error);
+    return {
+      featureRequestsCount: 0,
+      totalUpvotesReceived: 0,
+      commentsCount: 0,
+      votesGiven: 0,
+    };
+  }
 }
