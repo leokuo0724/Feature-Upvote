@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { X, Plus } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -15,6 +14,7 @@ import {
   Input,
   Textarea,
   Badge,
+  LabelSelector,
 } from "@/shared/ui";
 import { CreateFeatureRequestData, FeatureRequest } from "@/shared/types";
 import { useAuth } from "@/shared/hooks/use-auth";
@@ -52,8 +52,7 @@ export function CreateFeatureRequestForm({
   const { user } = useAuth();
   const createFeatureRequest = useCreateFeatureRequest();
   const updateFeatureRequest = useUpdateFeatureRequest();
-  const [labels, setLabels] = useState<string[]>([]);
-  const [labelInput, setLabelInput] = useState("");
+  const [labelIds, setLabelIds] = useState<string[]>([]);
 
   const isEditMode = !!editData;
 
@@ -77,36 +76,16 @@ export function CreateFeatureRequestForm({
         title: editData.title,
         description: editData.description,
       });
-      setLabels(editData.labels || []);
+      setLabelIds(editData.labels || []);
     } else if (!open) {
       // 關閉時重置表單
       reset({
         title: "",
         description: "",
       });
-      setLabels([]);
-      setLabelInput("");
+      setLabelIds([]);
     }
   }, [editData, open, reset]);
-
-  const handleAddLabel = () => {
-    const trimmedLabel = labelInput.trim();
-    if (trimmedLabel && !labels.includes(trimmedLabel)) {
-      setLabels([...labels, trimmedLabel]);
-      setLabelInput("");
-    }
-  };
-
-  const handleRemoveLabel = (labelToRemove: string) => {
-    setLabels(labels.filter((label) => label !== labelToRemove));
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleAddLabel();
-    }
-  };
 
   const onSubmit = async (data: CreateFeatureRequestFormData) => {
     if (!user) return;
@@ -114,7 +93,7 @@ export function CreateFeatureRequestForm({
     try {
       const createData: CreateFeatureRequestData = {
         ...data,
-        labels,
+        labels: labelIds,
       };
 
       if (isEditMode) {
@@ -137,8 +116,7 @@ export function CreateFeatureRequestForm({
 
       // Reset form
       reset();
-      setLabels([]);
-      setLabelInput("");
+      setLabelIds([]);
       onOpenChange(false);
       onSuccess?.();
     } catch (error) {
@@ -148,8 +126,7 @@ export function CreateFeatureRequestForm({
 
   const handleClose = () => {
     reset();
-    setLabels([]);
-    setLabelInput("");
+    setLabelIds([]);
     onOpenChange(false);
   };
 
@@ -200,51 +177,17 @@ export function CreateFeatureRequestForm({
             )}
           </div>
 
-          <div className="space-y-2">
-            <label htmlFor="labels" className="text-sm font-medium">
-              Labels (optional)
-            </label>
-            <div className="flex gap-2">
-              <Input
-                id="labels"
-                placeholder="Add a label"
-                value={labelInput}
-                onChange={(e) => setLabelInput(e.target.value)}
-                onKeyPress={handleKeyPress}
-                className="flex-1"
+          {/* Labels - Only for admins */}
+          {user.isAdmin && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Labels (optional)</label>
+              <LabelSelector
+                selectedLabelIds={labelIds}
+                onSelectionChange={setLabelIds}
+                placeholder="Select labels for this feature request..."
               />
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleAddLabel}
-                disabled={!labelInput.trim()}
-              >
-                <Plus className="h-4 w-4" />
-              </Button>
             </div>
-
-            {labels.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-2">
-                {labels.map((label) => (
-                  <Badge
-                    key={label}
-                    variant="secondary"
-                    className="flex items-center gap-1"
-                  >
-                    {label}
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveLabel(label)}
-                      className="ml-1 hover:text-destructive"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </Badge>
-                ))}
-              </div>
-            )}
-          </div>
+          )}
 
           <DialogFooter>
             <Button
