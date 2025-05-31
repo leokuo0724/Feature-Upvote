@@ -4,7 +4,8 @@ export type FeatureRequestStatus =
   | "Completed"
   | "Won't Do"
   | "Considering"
-  | "Will Do";
+  | "Will Do"
+  | "Archived";
 
 export interface FeatureRequest {
   id: string;

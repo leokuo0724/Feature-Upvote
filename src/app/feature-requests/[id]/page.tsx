@@ -46,6 +46,7 @@ const statusColors = {
   "Won't Do": "destructive",
   Considering: "secondary",
   "Will Do": "success",
+  Archived: "outline",
 } as const;
 
 export default function FeatureRequestDetailPage() {

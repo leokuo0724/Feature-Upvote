@@ -57,6 +57,7 @@ const statusColors = {
   "Won't Do": "deprecated",
   Considering: "info1",
   "Will Do": "info2",
+  Archived: "outline",
 } as const;
 
 export function FeatureRequestCard({

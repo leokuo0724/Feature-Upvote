@@ -366,6 +366,7 @@ export async function getStatusCounts(): Promise<{
   open: number;
   "in-progress": number;
   done: number;
+  archived: number;
 }> {
   try {
     // Get counts for each status group using separate queries
@@ -379,6 +380,7 @@ export async function getStatusCounts(): Promise<{
       inProgressQuery,
       completedQuery,
       wontDoQuery,
+      archivedQuery,
     ] = await Promise.all([
       getDocs(query(collectionRef, where("status", "==", "Open"))),
       getDocs(query(collectionRef, where("status", "==", "Considering"))),
@@ -386,6 +388,7 @@ export async function getStatusCounts(): Promise<{
       getDocs(query(collectionRef, where("status", "==", "In Progress"))),
       getDocs(query(collectionRef, where("status", "==", "Completed"))),
       getDocs(query(collectionRef, where("status", "==", "Won't Do"))),
+      getDocs(query(collectionRef, where("status", "==", "Archived"))),
     ]);
 
     const openCount = openQuery.size;
@@ -394,8 +397,10 @@ export async function getStatusCounts(): Promise<{
     const inProgressCount = inProgressQuery.size;
     const completedCount = completedQuery.size;
     const wontDoCount = wontDoQuery.size;
+    const archivedCount = archivedQuery.size;
 
     return {
+      // "all" excludes archived
       all:
         openCount +
         consideringCount +
@@ -406,6 +411,7 @@ export async function getStatusCounts(): Promise<{
       open: openCount + consideringCount + willDoCount,
       "in-progress": inProgressCount,
       done: completedCount + wontDoCount,
+      archived: archivedCount,
     };
   } catch (error) {
     console.error("Error getting status counts:", error);
@@ -414,6 +420,7 @@ export async function getStatusCounts(): Promise<{
       open: 0,
       "in-progress": 0,
       done: 0,
+      archived: 0,
     };
   }
 }

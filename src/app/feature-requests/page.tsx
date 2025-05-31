@@ -33,29 +33,27 @@ import {
 } from "@/entities/feature-request";
 import { FeatureRequestCard } from "@/widgets/feature-request-card";
 import { CreateFeatureRequestForm } from "@/features/create-feature-request";
-import { ALL_STATUSES } from "@/shared/config/constants";
+import {
+  ALL_STATUSES,
+  PUBLIC_STATUSES,
+  ARCHIVED_STATUS,
+} from "@/shared/config/constants";
 
 // Define tab groups for user interface
-type TabGroup = "all" | "open" | "in-progress" | "done";
+type TabGroup = "all" | "open" | "in-progress" | "done" | "archived";
 
 type TabOption = {
   value: TabGroup;
   label: string;
   statuses: FeatureRequestStatus[];
+  adminOnly?: boolean;
 };
 
 const tabOptions: TabOption[] = [
   {
     value: "all",
     label: "All",
-    statuses: [
-      "Open",
-      "Considering",
-      "Will Do",
-      "In Progress",
-      "Completed",
-      "Won't Do",
-    ],
+    statuses: PUBLIC_STATUSES, // Exclude archived from "all"
   },
   {
     value: "open",
@@ -71,6 +69,12 @@ const tabOptions: TabOption[] = [
     value: "done",
     label: "Done",
     statuses: ["Completed", "Won't Do"],
+  },
+  {
+    value: "archived",
+    label: "Archived",
+    statuses: [ARCHIVED_STATUS],
+    adminOnly: true,
   },
 ];
 
@@ -116,11 +120,23 @@ function FeatureRequestsContent() {
   const [activeTab, setActiveTab] = useState<TabGroup>(tabFromUrl || "open");
 
   // Get tab counts
-  const { data: tabCounts = { all: 0, open: 0, "in-progress": 0, done: 0 } } =
-    useTabGroupCounts();
+  const {
+    data: tabCounts = {
+      all: 0,
+      open: 0,
+      "in-progress": 0,
+      done: 0,
+      archived: 0,
+    },
+  } = useTabGroupCounts();
 
   // Import delete mutation
   const deleteFeatureRequest = useDeleteFeatureRequest();
+
+  // Filter tabs based on user permissions
+  const visibleTabOptions = tabOptions.filter(
+    (tab) => !tab.adminOnly || user?.isAdmin
+  );
 
   // Update URL when tab changes (simplified)
   const handleTabChange = (value: string) => {
@@ -145,7 +161,8 @@ function FeatureRequestsContent() {
 
   // Get current tab option
   const currentTabOption =
-    tabOptions.find((tab) => tab.value === activeTab) || tabOptions[0];
+    visibleTabOptions.find((tab) => tab.value === activeTab) ||
+    visibleTabOptions[0];
 
   // Build query params based on selected tab
   const queryParams = {
@@ -257,8 +274,14 @@ function FeatureRequestsContent() {
                 onValueChange={handleTabChange}
                 className="w-auto"
               >
-                <TabsList className="grid w-full grid-cols-4">
-                  {tabOptions.map((option) => (
+                <TabsList
+                  className={`grid w-full ${
+                    visibleTabOptions.length === 5
+                      ? "grid-cols-5"
+                      : "grid-cols-4"
+                  }`}
+                >
+                  {visibleTabOptions.map((option) => (
                     <TabsTrigger
                       key={option.value}
                       value={option.value}
@@ -288,7 +311,7 @@ function FeatureRequestsContent() {
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
-                  {tabOptions.map((option) => (
+                  {visibleTabOptions.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
                       <div className="flex items-center gap-2">
                         <span>{option.label}</span>

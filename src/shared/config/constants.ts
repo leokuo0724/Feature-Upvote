@@ -12,7 +12,16 @@ export const ADMIN_STATUSES: FeatureRequestStatus[] = [
   "Will Do",
 ];
 
+export const ARCHIVED_STATUS: FeatureRequestStatus = "Archived";
+
 export const ALL_STATUSES: FeatureRequestStatus[] = [
+  ...FEATURE_REQUEST_STATUSES,
+  ...ADMIN_STATUSES,
+  ARCHIVED_STATUS,
+];
+
+// All statuses except archived (for general users and "all" tab)
+export const PUBLIC_STATUSES: FeatureRequestStatus[] = [
   ...FEATURE_REQUEST_STATUSES,
   ...ADMIN_STATUSES,
 ];
