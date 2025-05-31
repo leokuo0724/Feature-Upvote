@@ -28,8 +28,6 @@ function convertFirestoreLabelDoc(
   return {
     id: docId,
     name: data.name || "",
-    backgroundColor: data.backgroundColor || "#f3f4f6",
-    textColor: data.textColor || "#374151",
     createdBy: data.createdBy || "",
     // Convert Firestore Timestamps to Date objects
     createdAt:

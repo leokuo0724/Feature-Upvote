@@ -179,7 +179,7 @@ export default function FeatureRequestsPage() {
           {statusTabs.map((tab) => (
             <TabsContent key={tab.value} value={tab.value} className="mt-0">
               {isLoading ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {Array.from({ length: 6 }).map((_, i) => (
                     <div
                       key={i}
@@ -214,7 +214,7 @@ export default function FeatureRequestsPage() {
               ) : (
                 <div className="space-y-6">
                   {/* Feature Requests Grid */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {featureRequests.map((featureRequest) => (
                       <FeatureRequestCard
                         key={featureRequest.id}

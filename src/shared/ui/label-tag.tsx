@@ -1,6 +1,8 @@
 "use client";
 
+import { Tag } from "lucide-react";
 import { useLabel } from "@/entities/label";
+import { Badge } from "./badge";
 
 interface LabelTagProps {
   labelId: string;
@@ -16,15 +18,9 @@ export function LabelTag({ labelId, className = "" }: LabelTagProps) {
   }
 
   return (
-    <span
-      className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${className}`}
-      style={{
-        backgroundColor: label.backgroundColor,
-        color: label.textColor,
-        borderColor: label.textColor + "20", // 20% opacity for border
-      }}
-    >
+    <Badge variant="outline" className={`text-xs ${className}`}>
+      <Tag className="h-3 w-3 mr-1" />
       {label.name}
-    </span>
+    </Badge>
   );
 }

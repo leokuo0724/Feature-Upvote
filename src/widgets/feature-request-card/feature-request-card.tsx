@@ -143,7 +143,7 @@ export function FeatureRequestCard({
 
   return (
     <Card
-      className="group cursor-pointer transition-all hover:shadow-md hover:border-primary/20"
+      className="group cursor-pointer transition-all hover:shadow-md hover:border-primary/20 flex flex-col justify-between"
       onClick={handleCardClick}
     >
       <CardHeader className="pb-3">
@@ -194,51 +194,52 @@ export function FeatureRequestCard({
         </div>
       </CardHeader>
 
-      <CardContent className="py-3">
-        <div className="flex items-center gap-2 flex-wrap">
-          <Badge variant={statusColors[featureRequest.status] || "default"}>
-            {featureRequest.status}
-          </Badge>
+      <div>
+        <CardContent className="py-3">
+          <div className="flex items-center gap-2 flex-wrap">
+            <Badge variant={statusColors[featureRequest.status] || "default"}>
+              {featureRequest.status}
+            </Badge>
 
-          {featureRequest.labels.map((labelId) => (
-            <LabelTag key={labelId} labelId={labelId} />
-          ))}
-        </div>
-      </CardContent>
-
-      <CardFooter className="pt-3 border-t bg-muted/20">
-        <div className="flex items-center justify-between w-full">
-          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-            <div className="flex items-center gap-1">
-              <MessageCircle className="h-4 w-4" />
-              <span>{formatCount(commentCount)}</span>
-            </div>
-
-            <div className="flex items-center gap-1">
-              <span>by {featureRequest.authorName}</span>
-              <span>•</span>
-              <span>
-                {formatDistanceToNow(featureRequest.createdAt, {
-                  addSuffix: true,
-                })}
-              </span>
-            </div>
+            {featureRequest.labels.map((labelId) => (
+              <LabelTag key={labelId} labelId={labelId} />
+            ))}
           </div>
+        </CardContent>
+        <CardFooter className="pt-3 border-t bg-muted/20">
+          <div className="flex items-center justify-between w-full">
+            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+              <div className="flex items-center gap-1">
+                <MessageCircle className="h-4 w-4" />
+                <span>{formatCount(commentCount)}</span>
+              </div>
 
-          <Button
-            variant={hasUpvoted ? "default" : "outline"}
-            size="sm"
-            className="flex items-center gap-1 min-w-[60px]"
-            onClick={handleUpvote}
-            disabled={isUpvoting || !user}
-          >
-            <ChevronUp
-              className={`h-4 w-4 ${hasUpvoted ? "fill-current" : ""}`}
-            />
-            <span>{formatCount(featureRequest.upvotes)}</span>
-          </Button>
-        </div>
-      </CardFooter>
+              <div className="flex items-center gap-1">
+                <span>by {featureRequest.authorName}</span>
+                <span>•</span>
+                <span>
+                  {formatDistanceToNow(featureRequest.createdAt, {
+                    addSuffix: true,
+                  })}
+                </span>
+              </div>
+            </div>
+
+            <Button
+              variant={hasUpvoted ? "default" : "outline"}
+              size="sm"
+              className="flex items-center gap-1 min-w-[60px]"
+              onClick={handleUpvote}
+              disabled={isUpvoting || !user}
+            >
+              <ChevronUp
+                className={`h-4 w-4 ${hasUpvoted ? "fill-current" : ""}`}
+              />
+              <span>{formatCount(featureRequest.upvotes)}</span>
+            </Button>
+          </div>
+        </CardFooter>
+      </div>
     </Card>
   );
 }

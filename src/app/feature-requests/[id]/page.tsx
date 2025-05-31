@@ -11,7 +11,6 @@ import {
   MoreHorizontal,
   User,
   Calendar,
-  Tag,
 } from "lucide-react";
 import {
   Card,
@@ -28,6 +27,7 @@ import {
   Avatar,
   AvatarFallback,
   AvatarImage,
+  LabelTag,
 } from "@/shared/ui";
 import { useAuth } from "@/shared/hooks/use-auth";
 import {
@@ -192,11 +192,8 @@ export default function FeatureRequestDetailPage() {
                     {featureRequest.status}
                   </Badge>
 
-                  {featureRequest.labels.map((label) => (
-                    <Badge key={label} variant="outline" className="text-xs">
-                      <Tag className="h-3 w-3 mr-1" />
-                      {label}
-                    </Badge>
+                  {featureRequest.labels.map((labelId) => (
+                    <LabelTag key={labelId} labelId={labelId} />
                   ))}
                 </div>
               </div>
