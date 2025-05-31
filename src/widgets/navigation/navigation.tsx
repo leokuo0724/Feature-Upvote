@@ -17,11 +17,13 @@ import {
   AvatarImage,
 } from "@/shared/ui";
 import { useAuth } from "@/shared/hooks/use-auth";
+import { useSettings } from "@/shared/contexts/settings-context";
 
 export function Navigation() {
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
   const { user, signIn, signOut } = useAuth();
+  const { settings } = useSettings();
 
   const getInitials = (name: string) => {
     return name
@@ -57,10 +59,18 @@ export function Navigation() {
             <Link href="/" className="flex items-center space-x-2">
               <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
                 <span className="text-primary-foreground font-bold text-sm">
-                  FR
+                  {settings.logoUrl ? (
+                    <img
+                      src={settings.logoUrl}
+                      alt="Logo"
+                      className="h-6 w-6 object-contain"
+                    />
+                  ) : (
+                    getInitials(settings.projectName)
+                  )}
                 </span>
               </div>
-              <span className="font-bold text-xl">Feature Upvote</span>
+              <span className="font-bold text-xl">{settings.projectName}</span>
             </Link>
 
             <div className="hidden md:flex items-center space-x-6">

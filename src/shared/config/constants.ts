@@ -44,4 +44,5 @@ export const COLLECTIONS = {
   ADMIN_EMAILS: "adminEmails",
   LABELS: "labels",
   ANALYTICS: "analytics",
+  SETTINGS: "settings",
 } as const;

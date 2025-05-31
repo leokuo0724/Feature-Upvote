@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useRouter } from "next/navigation";
 import { formatDistanceToNow } from "date-fns";
 import {
   User,
@@ -32,6 +33,7 @@ import { FeatureRequest } from "@/shared/types";
 
 export default function ProfilePage() {
   const { user, loading } = useAuth();
+  const router = useRouter();
 
   // Get user data
   const {
@@ -86,7 +88,7 @@ export default function ProfilePage() {
   };
 
   const handleFeatureRequestClick = (featureRequest: FeatureRequest) => {
-    window.location.href = `/feature-requests/${featureRequest.id}`;
+    router.push(`/feature-requests/${featureRequest.id}`);
   };
 
   // Flatten all feature requests from all pages
@@ -216,9 +218,7 @@ export default function ProfilePage() {
                   <p className="text-muted-foreground mb-4">
                     You haven't created any feature requests yet.
                   </p>
-                  <Button
-                    onClick={() => (window.location.href = "/feature-requests")}
-                  >
+                  <Button onClick={() => router.push("/feature-requests")}>
                     Create Your First Request
                   </Button>
                 </div>

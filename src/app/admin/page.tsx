@@ -25,15 +25,7 @@ const adminFeatures = [
     href: "/admin/labels",
     color: "text-blue-600",
     bgColor: "bg-blue-50",
-  },
-  {
-    title: "User Management",
-    description: "Manage user roles and permissions",
-    icon: Users,
-    href: "/admin/users",
-    color: "text-green-600",
-    bgColor: "bg-green-50",
-    disabled: true,
+    disabled: false,
   },
   {
     title: "Settings",
@@ -42,7 +34,7 @@ const adminFeatures = [
     href: "/admin/settings",
     color: "text-orange-600",
     bgColor: "bg-orange-50",
-    disabled: true,
+    disabled: false,
   },
 ];
 
@@ -163,7 +155,7 @@ export default function AdminPage() {
         </div>
 
         {/* Admin Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {adminFeatures.map((feature) => {
             const IconComponent = feature.icon;
 

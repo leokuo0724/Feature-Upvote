@@ -35,6 +35,14 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // Settings collection
+    match /settings/{settingsId} {
+      // Anyone can read settings (needed for app customization)
+      allow read: if true;
+      // Only admins can manage settings
+      allow write: if isAdmin();
+    }
+
     // Labels collection
     match /labels/{labelId} {
       // Anyone can read labels (needed for display)

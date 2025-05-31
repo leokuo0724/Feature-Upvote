@@ -193,9 +193,8 @@ function FeatureRequestsContent() {
     // The query will automatically refetch due to cache invalidation
   };
 
-  const handleFeatureRequestClick = (featureRequest: any) => {
-    // Navigate to feature request details page
-    window.location.href = `/feature-requests/${featureRequest.id}`;
+  const handleFeatureRequestClick = (featureRequest: FeatureRequest) => {
+    router.push(`/feature-requests/${featureRequest.id}`);
   };
 
   const handleEdit = (featureRequest: FeatureRequest) => {
@@ -203,14 +202,16 @@ function FeatureRequestsContent() {
   };
 
   const handleDelete = async (featureRequest: FeatureRequest) => {
-    if (!confirm("Are you sure you want to delete this feature request?")) {
-      return;
-    }
-
-    try {
-      await deleteFeatureRequest.mutateAsync(featureRequest.id);
-    } catch (error) {
-      console.error("Error deleting feature request:", error);
+    if (
+      window.confirm(
+        "Are you sure you want to delete this feature request? This action cannot be undone."
+      )
+    ) {
+      try {
+        await deleteFeatureRequest.mutateAsync(featureRequest.id);
+      } catch (error) {
+        console.error("Error deleting feature request:", error);
+      }
     }
   };
 
@@ -219,23 +220,19 @@ function FeatureRequestsContent() {
   };
 
   const getSortIcon = () => {
-    const option = sortOptions.find((opt) => opt.value === sortBy);
-    return option?.icon || SortDesc;
+    return sortOptions.find((opt) => opt.value === sortBy)?.icon || SortDesc;
   };
 
   const getSortLabel = () => {
-    const option = sortOptions.find((opt) => opt.value === sortBy);
-    return option?.label || "Most Upvoted";
+    return sortOptions.find((opt) => opt.value === sortBy)?.label || "Sort";
   };
 
-  // Get count for each tab group
   const getTabCount = (tabValue: TabGroup) => {
     return tabCounts[tabValue] || 0;
   };
 
-  // Get current tab label
   const getCurrentTabLabel = () => {
-    return currentTabOption.label;
+    return currentTabOption?.label || "All";
   };
 
   return (
@@ -288,7 +285,7 @@ function FeatureRequestsContent() {
                       className="flex items-center gap-2"
                     >
                       {option.label}
-                      <Badge variant="secondary" className="ml-1 text-xs">
+                      <Badge variant="outline" className="ml-1 text-xs">
                         {getTabCount(option.value)}
                       </Badge>
                     </TabsTrigger>
@@ -304,7 +301,7 @@ function FeatureRequestsContent() {
                   <SelectValue>
                     <div className="flex items-center gap-2">
                       <span>{getCurrentTabLabel()}</span>
-                      <Badge variant="secondary" className="text-xs">
+                      <Badge variant="outline" className="text-xs">
                         {getTabCount(activeTab)}
                       </Badge>
                     </div>
@@ -315,7 +312,7 @@ function FeatureRequestsContent() {
                     <SelectItem key={option.value} value={option.value}>
                       <div className="flex items-center gap-2">
                         <span>{option.label}</span>
-                        <Badge variant="secondary" className="text-xs">
+                        <Badge variant="outline" className="text-xs">
                           {getTabCount(option.value)}
                         </Badge>
                       </div>
@@ -437,19 +434,16 @@ function FeatureRequestsContent() {
   );
 }
 
-// Loading component for Suspense fallback
 function FeatureRequestsLoading() {
   return (
     <div className="container mx-auto py-8">
       <div className="max-w-6xl mx-auto">
-        <div className="animate-pulse space-y-6">
-          <div className="h-8 bg-muted rounded w-1/3"></div>
-          <div className="h-12 bg-muted rounded"></div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="h-48 bg-muted rounded-lg" />
-            ))}
-          </div>
+        <div className="h-8 bg-muted animate-pulse rounded mb-4"></div>
+        <div className="h-4 bg-muted animate-pulse rounded w-1/2 mb-8"></div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="h-48 bg-muted animate-pulse rounded-lg" />
+          ))}
         </div>
       </div>
     </div>
