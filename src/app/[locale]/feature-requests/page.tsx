@@ -2,11 +2,10 @@
 
 import React, { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Plus, Filter, SortAsc, SortDesc, ChevronDown } from "lucide-react";
+import { Plus, SortAsc, SortDesc } from "lucide-react";
 import { useTranslations } from "next-intl";
 import {
   Tabs,
-  TabsContent,
   TabsList,
   TabsTrigger,
   Button,
@@ -34,11 +33,7 @@ import {
 } from "@/entities/feature-request";
 import { FeatureRequestCard } from "@/widgets/feature-request-card";
 import { CreateFeatureRequestForm } from "@/features/create-feature-request";
-import {
-  ALL_STATUSES,
-  PUBLIC_STATUSES,
-  ARCHIVED_STATUS,
-} from "@/shared/config/constants";
+import { PUBLIC_STATUSES, ARCHIVED_STATUS } from "@/shared/config/constants";
 
 // Define tab groups for user interface
 type TabGroup = "all" | "open" | "in-progress" | "done" | "archived";
@@ -156,7 +151,7 @@ function FeatureRequestsContent() {
     if (urlTab && urlTab !== activeTab) {
       setActiveTab(urlTab);
     }
-  }, []); // Only run on mount
+  }, [searchParams, activeTab]); // Add searchParams and activeTab to dependencies
 
   const currentSort =
     sortOptions.find((opt) => opt.value === sortBy)?.sort ||

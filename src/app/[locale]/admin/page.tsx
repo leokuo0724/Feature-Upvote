@@ -170,7 +170,7 @@ export default function AdminPage() {
         </div>
 
         {/* Admin Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {adminFeatures.map((feature) => {
             const IconComponent = feature.icon;
 
