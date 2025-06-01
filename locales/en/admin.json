@@ -69,27 +69,30 @@
     "loading": "Loading...",
     "tabs": {
       "branding": "Branding",
-      "appearance": "Appearance"
+      "theme": "Theme",
+      "features": "Features",
+      "advanced": "Advanced"
     },
     "branding": {
-      "title": "Branding Settings",
+      "title": "Basic Information",
       "description": "Customize your platform's identity",
       "projectName": {
         "label": "Project Name",
-        "placeholder": "Enter project name",
+        "placeholder": "Feature Upvote",
         "error": "Project name is required"
       },
       "tagline": {
         "label": "Tagline",
-        "placeholder": "Enter a catchy tagline",
+        "placeholder": "A feature request and upvoting platform for product teams",
         "error": "Tagline is required"
       }
     },
-    "appearance": {
-      "title": "Appearance Settings",
+    "theme": {
+      "title": "Color Scheme",
       "description": "Customize the look and feel",
       "primaryColor": {
         "label": "Primary Color",
+        "placeholder": "#3b82f6",
         "description": "Choose your brand's primary color",
         "error": "Invalid color format"
       },
@@ -103,10 +106,19 @@
         }
       }
     },
+    "features": {
+      "title": "Feature Flags",
+      "description": "Feature configuration will be available in the next update."
+    },
+    "advanced": {
+      "title": "Advanced Settings",
+      "description": "Advanced customization options will be available in the next update."
+    },
     "actions": {
       "save": "Save Changes",
       "saving": "Saving...",
-      "saved": "Settings saved successfully!"
+      "saved": "Settings saved successfully!",
+      "reset": "Reset"
     }
   }
 }

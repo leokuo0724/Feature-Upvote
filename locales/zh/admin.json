@@ -69,27 +69,30 @@
     "loading": "載入中...",
     "tabs": {
       "branding": "品牌設定",
-      "appearance": "外觀設定"
+      "theme": "主題設定",
+      "features": "功能設定",
+      "advanced": "進階設定"
     },
     "branding": {
-      "title": "品牌設定",
+      "title": "基本資訊",
       "description": "自訂您平台的身份識別",
       "projectName": {
         "label": "專案名稱",
-        "placeholder": "輸入專案名稱",
+        "placeholder": "Feature Upvote",
         "error": "專案名稱為必填項目"
       },
       "tagline": {
         "label": "標語",
-        "placeholder": "輸入吸引人的標語",
+        "placeholder": "為產品團隊提供的功能請求和投票平台",
         "error": "標語為必填項目"
       }
     },
-    "appearance": {
-      "title": "外觀設定",
+    "theme": {
+      "title": "色彩配置",
       "description": "自訂外觀和感覺",
       "primaryColor": {
         "label": "主要顏色",
+        "placeholder": "#3b82f6",
         "description": "選擇您品牌的主要顏色",
         "error": "無效的顏色格式"
       },
@@ -103,10 +106,19 @@
         }
       }
     },
+    "features": {
+      "title": "功能開關",
+      "description": "功能配置將在下次更新中提供。"
+    },
+    "advanced": {
+      "title": "進階設定",
+      "description": "進階自訂選項將在下次更新中提供。"
+    },
     "actions": {
       "save": "儲存變更",
       "saving": "儲存中...",
-      "saved": "設定已成功儲存！"
+      "saved": "設定已成功儲存！",
+      "reset": "重設"
     }
   }
 }

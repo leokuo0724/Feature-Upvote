@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useTranslations } from "next-intl";
 import {
   Card,
   CardContent,
@@ -24,15 +25,6 @@ import { updateAppSettings } from "@/entities/settings/api/firebase";
 import { useSettings } from "@/shared/contexts/settings-context";
 import { AppSettings } from "@/shared/types/settings";
 import { Palette, Globe, Settings, Flag } from "lucide-react";
-
-const settingsSchema = z.object({
-  projectName: z.string().min(1, "Project name is required"),
-  tagline: z.string().min(1, "Tagline is required"),
-  primaryColor: z.string().regex(/^#[0-9A-F]{6}$/i, "Invalid color format"),
-  defaultTheme: z.enum(["light", "dark", "system"]),
-});
-
-type SettingsFormData = z.infer<typeof settingsSchema>;
 
 // Custom ColorPicker component that auto-saves on outside click
 interface ColorPickerProps {
@@ -97,10 +89,22 @@ function ColorPicker({ value, onChange, className }: ColorPickerProps) {
 
 export default function AdminSettingsPage() {
   const { user } = useAuth();
+  const t = useTranslations("admin");
   const [activeTab, setActiveTab] = useState("branding");
   const [isUpdating, setIsUpdating] = useState(false);
 
   const { settings, isLoading, refetch } = useSettings();
+
+  const settingsSchema = z.object({
+    projectName: z.string().min(1, t("settings.branding.projectName.error")),
+    tagline: z.string().min(1, t("settings.branding.tagline.error")),
+    primaryColor: z
+      .string()
+      .regex(/^#[0-9A-F]{6}$/i, t("settings.theme.primaryColor.error")),
+    defaultTheme: z.enum(["light", "dark", "system"]),
+  });
+
+  type SettingsFormData = z.infer<typeof settingsSchema>;
 
   const {
     register,
@@ -148,21 +152,15 @@ export default function AdminSettingsPage() {
     }
   };
 
-  // Auto-save function for color picker
-  const handleColorAutoSave = async () => {
-    if (isDirty) {
-      const currentValues = watch();
-      await onSubmit(currentValues);
-    }
-  };
-
   if (!user?.isAdmin) {
     return (
       <div className="container mx-auto py-8">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-2xl font-bold mb-4">Access Denied</h1>
+          <h1 className="text-2xl font-bold mb-4">
+            {t("access.adminRequired.title")}
+          </h1>
           <p className="text-muted-foreground">
-            You need admin privileges to access this page.
+            {t("access.adminRequired.message")}
           </p>
         </div>
       </div>
@@ -173,7 +171,7 @@ export default function AdminSettingsPage() {
     return (
       <div className="container mx-auto py-8">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-2xl font-bold mb-4">Loading...</h1>
+          <h1 className="text-2xl font-bold mb-4">{t("settings.loading")}</h1>
         </div>
       </div>
     );
@@ -186,12 +184,10 @@ export default function AdminSettingsPage() {
       <div className="max-w-4xl mx-auto space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold">App Settings</h1>
-            <p className="text-muted-foreground">
-              Customize your feature upvote platform
-            </p>
+            <h1 className="text-3xl font-bold">{t("settings.title")}</h1>
+            <p className="text-muted-foreground">{t("settings.subtitle")}</p>
           </div>
-          <Badge variant="secondary">Admin Only</Badge>
+          <Badge variant="secondary">{t("settings.adminOnly")}</Badge>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -199,26 +195,30 @@ export default function AdminSettingsPage() {
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="branding" className="flex items-center gap-2">
                 <Globe className="h-4 w-4" />
-                Branding
+                {t("settings.tabs.branding")}
               </TabsTrigger>
               <TabsTrigger value="theme" className="flex items-center gap-2">
                 <Palette className="h-4 w-4" />
-                Theme
+                {t("settings.tabs.theme")}
               </TabsTrigger>
             </TabsList>
 
             <TabsContent value="branding" className="space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Basic Information</CardTitle>
+                  <CardTitle>{t("settings.branding.title")}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="projectName">Project Name</Label>
+                    <Label htmlFor="projectName">
+                      {t("settings.branding.projectName.label")}
+                    </Label>
                     <Input
                       id="projectName"
                       {...register("projectName")}
-                      placeholder="Feature Upvote"
+                      placeholder={t(
+                        "settings.branding.projectName.placeholder"
+                      )}
                     />
                     {errors.projectName && (
                       <p className="text-sm text-destructive">
@@ -228,11 +228,13 @@ export default function AdminSettingsPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="tagline">Tagline</Label>
+                    <Label htmlFor="tagline">
+                      {t("settings.branding.tagline.label")}
+                    </Label>
                     <Textarea
                       id="tagline"
                       {...register("tagline")}
-                      placeholder="A feature request and upvoting platform for product teams"
+                      placeholder={t("settings.branding.tagline.placeholder")}
                       rows={3}
                     />
                     {errors.tagline && (
@@ -248,12 +250,14 @@ export default function AdminSettingsPage() {
             <TabsContent value="theme" className="space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Color Scheme</CardTitle>
+                  <CardTitle>{t("settings.theme.title")}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="primaryColor">Primary Color</Label>
+                      <Label htmlFor="primaryColor">
+                        {t("settings.theme.primaryColor.label")}
+                      </Label>
                       <ColorPicker
                         value={primaryColor}
                         onChange={(value) => {
@@ -273,15 +277,23 @@ export default function AdminSettingsPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="defaultTheme">Default Theme</Label>
+                    <Label htmlFor="defaultTheme">
+                      {t("settings.theme.defaultTheme.label")}
+                    </Label>
                     <select
                       id="defaultTheme"
                       {...register("defaultTheme")}
                       className="w-full p-2 border rounded-md"
                     >
-                      <option value="system">System</option>
-                      <option value="light">Light</option>
-                      <option value="dark">Dark</option>
+                      <option value="system">
+                        {t("settings.theme.defaultTheme.options.system")}
+                      </option>
+                      <option value="light">
+                        {t("settings.theme.defaultTheme.options.light")}
+                      </option>
+                      <option value="dark">
+                        {t("settings.theme.defaultTheme.options.dark")}
+                      </option>
                     </select>
                   </div>
                 </CardContent>
@@ -291,11 +303,11 @@ export default function AdminSettingsPage() {
             <TabsContent value="features" className="space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Feature Flags</CardTitle>
+                  <CardTitle>{t("settings.features.title")}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                    Feature configuration will be available in the next update.
+                    {t("settings.features.description")}
                   </p>
                 </CardContent>
               </Card>
@@ -304,12 +316,11 @@ export default function AdminSettingsPage() {
             <TabsContent value="advanced" className="space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Advanced Settings</CardTitle>
+                  <CardTitle>{t("settings.advanced.title")}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                    Advanced customization options will be available in the next
-                    update.
+                    {t("settings.advanced.description")}
                   </p>
                 </CardContent>
               </Card>
@@ -323,10 +334,12 @@ export default function AdminSettingsPage() {
               onClick={() => reset()}
               disabled={!isDirty}
             >
-              Reset
+              {t("settings.actions.reset")}
             </Button>
             <Button type="submit" disabled={!isDirty || isUpdating}>
-              {isUpdating ? "Saving..." : "Save Changes"}
+              {isUpdating
+                ? t("settings.actions.saving")
+                : t("settings.actions.save")}
             </Button>
           </div>
         </form>
