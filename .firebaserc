@@ -1,5 +1,7 @@
 {
   "projects": {
-    "default": "baseball-game-feature-upvote"
-  }
+    "staging": "feature-upote-demo"
+  },
+  "targets": {},
+  "etags": {}
 }

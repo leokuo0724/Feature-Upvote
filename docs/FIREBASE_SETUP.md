@@ -36,8 +36,8 @@
 #### Firestore Database Setup
 
 1. Left menu → "Firestore Database" → "Create database"
-2. Select "Start in test mode"
-3. Choose database location (recommended: `asia-east1`)
+2. Choose database location (recommended: `asia-east1`)
+3. Select "Start in test mode"
 4. Click "Done"
 
 ### Step 3: Get Configuration
@@ -62,6 +62,8 @@ NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
 
 ### Step 5: Deploy Firebase Configuration
 
+For uploading firestore rules and indexes config in this project.
+
 ```bash
 # 1. Login to Firebase CLI
 firebase login
@@ -73,6 +75,17 @@ firebase use --add
 # 3. Deploy Firestore rules and indexes
 firebase deploy --only firestore
 ```
+
+#### ⏳ Important: Index Building Process
+
+After deploying `firestore.indexes.json`, Firestore needs time to build the indexes:
+
+1. **Monitor Progress**: Go to [Firebase Console](https://console.firebase.google.com/) → Your Project → Firestore Database → **Indexes** tab
+2. **Building Status**: You'll see indexes with status "Building" - this can take several minutes
+3. **Wait for Completion**: Your app's API calls may fail until all indexes are built
+4. **Ready Status**: Once all indexes show "Enabled" status, your app will work properly
+
+💡 **Tip**: Don't start testing your app immediately after deployment. Wait for all indexes to complete building first.
 
 ### Step 6: Setup Admin
 
@@ -103,80 +116,6 @@ In Firestore Console:
 3. Test Google sign-in
 4. Check admin permissions (should see Admin menu)
 
-## 📊 Database Structure
-
-The app will automatically create these collections:
-
-### `users` - User Data
-
-```
-{
-  uid: string,
-  email: string,
-  displayName: string,
-  photoURL: string,
-  isAdmin: boolean,
-  createdAt: timestamp,
-  updatedAt: timestamp
-}
-```
-
-### `featureRequests` - Feature Requests
-
-```
-{
-  title: string,
-  description: string,
-  status: "Open" | "In Progress" | "Completed" | "Won't Do" | "Pending" | "Under Discussion" | "Will Do",
-  upvotes: number,
-  upvotedBy: string[],
-  labels: string[],
-  authorId: string,
-  commentsCount: number,
-  createdAt: timestamp,
-  updatedAt: timestamp
-}
-```
-
-### `comments` - Comments
-
-```
-{
-  content: string,
-  featureRequestId: string,
-  authorId: string,
-  authorName: string,
-  authorEmail: string,
-  createdAt: timestamp,
-  updatedAt: timestamp
-}
-```
-
-### `labels` - Labels
-
-```
-{
-  name: string,
-  createdBy: string,
-  createdAt: timestamp,
-  updatedAt: timestamp
-}
-```
-
-### `settings` - App Settings
-
-```
-{
-  projectName: string,
-  tagline: string,
-  primaryColor: string,
-  defaultTheme: "light" | "dark" | "system",
-  createdAt: timestamp,
-  updatedAt: timestamp,
-  updatedBy: string
-}
-```
-
 ## 🔧 Troubleshooting
 
 ### Common Issues
@@ -201,9 +140,27 @@ firebase deploy --only firestore:indexes
 
 ### Production Environment Setup
 
-1. **Authorized Domains**: Add production domain in Authentication → Settings → Authorized domains
-2. **Security Rules**: Review and optimize Firestore security rules
-3. **Quota Monitoring**: Set up Firebase usage quota alerts
+#### Authorized Domains Configuration
+
+Add your production domains to Firebase Authentication:
+
+**Steps:**
+
+1. Go to [Firebase Console](https://console.firebase.google.com/) → Your Project
+2. Authentication → Settings → Authorized domains
+3. Click "Add domain"
+4. Add your domains:
+   ```
+   your-app.vercel.app          # Vercel deployment
+   your-custom-domain.com       # Custom domain
+   localhost                    # Keep for local development
+   ```
+
+**Example domains to add:**
+
+- `my-feature-upvote.vercel.app`
+- `feedback.mycompany.com`
+- `features.myproduct.io`
 
 ---
 
@@ -265,6 +222,8 @@ NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
 
 ### 步驟 5: 部署 Firebase 配置
 
+用於上傳此專案中的 Firestore 規則和索引配置。
+
 ```bash
 # 1. 登入 Firebase CLI
 firebase login
@@ -276,6 +235,17 @@ firebase use --add
 # 3. 部署 Firestore 規則和索引
 firebase deploy --only firestore
 ```
+
+#### ⏳ 重要：索引建立過程
+
+部署 `firestore.indexes.json` 後，Firestore 需要時間來建立索引：
+
+1. **監控進度**：前往 [Firebase Console](https://console.firebase.google.com/) → 你的專案 → Firestore Database → **Indexes** 標籤
+2. **建立狀態**：你會看到索引狀態顯示為「Building」- 這可能需要幾分鐘時間
+3. **等待完成**：在所有索引建立完成前，你的應用程式 API 呼叫可能會失敗
+4. **就緒狀態**：當所有索引都顯示「Enabled」狀態時，你的應用程式就能正常運作
+
+💡 **提示**：部署後不要立即開始測試應用程式，請先等待所有索引建立完成。
 
 ### 步驟 6: 設置管理員
 
@@ -306,80 +276,6 @@ firebase deploy --only firestore
 3. 測試 Google 登入
 4. 檢查管理員權限（應該能看到 Admin 選單）
 
-## 📊 資料庫結構
-
-應用會自動創建以下集合：
-
-### `users` - 用戶資料
-
-```
-{
-  uid: string,
-  email: string,
-  displayName: string,
-  photoURL: string,
-  isAdmin: boolean,
-  createdAt: timestamp,
-  updatedAt: timestamp
-}
-```
-
-### `featureRequests` - 功能請求
-
-```
-{
-  title: string,
-  description: string,
-  status: "Open" | "In Progress" | "Completed" | "Won't Do" | "Pending" | "Under Discussion" | "Will Do",
-  upvotes: number,
-  upvotedBy: string[],
-  labels: string[],
-  authorId: string,
-  commentsCount: number,
-  createdAt: timestamp,
-  updatedAt: timestamp
-}
-```
-
-### `comments` - 評論
-
-```
-{
-  content: string,
-  featureRequestId: string,
-  authorId: string,
-  authorName: string,
-  authorEmail: string,
-  createdAt: timestamp,
-  updatedAt: timestamp
-}
-```
-
-### `labels` - 標籤
-
-```
-{
-  name: string,
-  createdBy: string,
-  createdAt: timestamp,
-  updatedAt: timestamp
-}
-```
-
-### `settings` - 應用設置
-
-```
-{
-  projectName: string,
-  tagline: string,
-  primaryColor: string,
-  defaultTheme: "light" | "dark" | "system",
-  createdAt: timestamp,
-  updatedAt: timestamp,
-  updatedBy: string
-}
-```
-
 ## 🔧 故障排除
 
 ### 常見問題
@@ -402,8 +298,26 @@ firebase deploy --only firestore:indexes
 - 確認 Firestore 規則已部署
 - 檢查管理員設置是否正確
 
-### 生產環境設置
+### 正式環境設置
 
-1. **授權域名**：在 Authentication → Settings → Authorized domains 添加生產域名
-2. **安全規則**：檢查並優化 Firestore 安全規則
-3. **配額監控**：設置 Firebase 使用配額警報
+#### 授權域名配置
+
+將你的正式域名添加到 Firebase Authentication：
+
+**步驟：**
+
+1. 前往 [Firebase Console](https://console.firebase.google.com/) → 你的專案
+2. Authentication → Settings → Authorized domains
+3. 點擊「Add domain」
+4. 添加你的域名：
+   ```
+   your-app.vercel.app          # Vercel 部署
+   your-custom-domain.com       # 自訂域名
+   localhost                    # 保留用於本地開發
+   ```
+
+**範例域名：**
+
+- `my-feature-upvote.vercel.app`
+- `feedback.mycompany.com`
+- `features.myproduct.io`
