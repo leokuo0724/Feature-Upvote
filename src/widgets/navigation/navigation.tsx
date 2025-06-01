@@ -1,10 +1,11 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Moon, Sun, LogIn, LogOut, User, Settings } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import {
   Button,
   DropdownMenu,
@@ -15,6 +16,7 @@ import {
   Avatar,
   AvatarFallback,
   AvatarImage,
+  LanguageSwitcher,
 } from "@/shared/ui";
 import { useAuth } from "@/shared/hooks/use-auth";
 import { useSettings } from "@/shared/contexts/settings-context";
@@ -24,6 +26,7 @@ export function Navigation() {
   const { theme, setTheme } = useTheme();
   const { user, signIn, signOut } = useAuth();
   const { settings } = useSettings();
+  const t = useTranslations();
 
   const getInitials = (name: string) => {
     return name
@@ -59,15 +62,7 @@ export function Navigation() {
             <Link href="/" className="flex items-center space-x-2">
               <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
                 <span className="text-primary-foreground font-bold text-sm">
-                  {settings.logoUrl ? (
-                    <img
-                      src={settings.logoUrl}
-                      alt="Logo"
-                      className="h-6 w-6 object-contain"
-                    />
-                  ) : (
-                    getInitials(settings.projectName)
-                  )}
+                  {getInitials(settings.projectName)}
                 </span>
               </div>
               <span className="font-bold text-xl">{settings.projectName}</span>
@@ -77,31 +72,34 @@ export function Navigation() {
               <Link
                 href="/feature-requests"
                 className={`text-sm font-medium transition-colors hover:text-primary ${
-                  pathname.startsWith("/feature-requests")
+                  pathname.includes("/feature-requests")
                     ? "text-primary"
                     : "text-muted-foreground"
                 }`}
               >
-                Feature Requests
+                {t("navigation.featureRequests")}
               </Link>
 
               {user?.isAdmin && (
                 <Link
                   href="/admin"
                   className={`text-sm font-medium transition-colors hover:text-primary ${
-                    pathname.startsWith("/admin")
+                    pathname.includes("/admin")
                       ? "text-primary"
                       : "text-muted-foreground"
                   }`}
                 >
-                  Admin
+                  {t("navigation.admin")}
                 </Link>
               )}
             </div>
           </div>
 
-          {/* Right side - Theme toggle and User menu */}
+          {/* Right side - Language switcher, Theme toggle and User menu */}
           <div className="flex items-center space-x-4">
+            {/* Language Switcher */}
+            <LanguageSwitcher />
+
             {/* Theme Toggle */}
             <Button
               variant="ghost"
@@ -138,7 +136,7 @@ export function Navigation() {
                       </p>
                       {user.isAdmin && (
                         <p className="text-xs text-primary font-medium">
-                          Admin
+                          {t("auth.profile.admin")}
                         </p>
                       )}
                     </div>
@@ -147,14 +145,14 @@ export function Navigation() {
                   <DropdownMenuItem asChild>
                     <Link href="/profile" className="cursor-pointer">
                       <User className="mr-2 h-4 w-4" />
-                      Profile
+                      {t("navigation.profile")}
                     </Link>
                   </DropdownMenuItem>
                   {user.isAdmin && (
                     <DropdownMenuItem asChild>
                       <Link href="/admin" className="cursor-pointer">
                         <Settings className="mr-2 h-4 w-4" />
-                        Admin Panel
+                        {t("navigation.admin")}
                       </Link>
                     </DropdownMenuItem>
                   )}
@@ -164,14 +162,14 @@ export function Navigation() {
                     className="cursor-pointer"
                   >
                     <LogOut className="mr-2 h-4 w-4" />
-                    Sign out
+                    {t("navigation.signOut")}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
               <Button onClick={handleSignIn} size="sm">
                 <LogIn className="mr-2 h-4 w-4" />
-                Sign In
+                {t("navigation.signIn")}
               </Button>
             )}
           </div>

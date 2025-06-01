@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useLayoutEffect, useRef } from "react";
 import { useSettings } from "@/shared/contexts/settings-context";
 
 interface ThemeProviderProps {
@@ -11,14 +11,15 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   const { settings, isLoading } = useSettings();
   const appliedSettingsRef = useRef<string>("");
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    // Only run on client side to avoid hydration issues
+    if (typeof window === "undefined") return;
+
     if (!isLoading && settings) {
       // Create a hash of current settings to avoid unnecessary updates
       const settingsHash = JSON.stringify({
         primaryColor: settings.primaryColor,
-        customCss: settings.customCss,
         projectName: settings.projectName,
-        faviconUrl: settings.faviconUrl,
       });
 
       // Only apply changes if settings have actually changed
@@ -71,33 +72,9 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
         root.style.setProperty("--primary", primaryHsl);
       }
 
-      // Apply custom CSS if provided
-      if (settings.customCss) {
-        let customStyleElement = document.getElementById("custom-styles");
-        if (!customStyleElement) {
-          customStyleElement = document.createElement("style");
-          customStyleElement.id = "custom-styles";
-          document.head.appendChild(customStyleElement);
-        }
-        customStyleElement.textContent = settings.customCss;
-      }
-
       // Update document title
       if (settings.projectName) {
         document.title = settings.projectName;
-      }
-
-      // Update favicon if provided
-      if (settings.faviconUrl) {
-        let favicon = document.querySelector(
-          'link[rel="icon"]'
-        ) as HTMLLinkElement;
-        if (!favicon) {
-          favicon = document.createElement("link");
-          favicon.rel = "icon";
-          document.head.appendChild(favicon);
-        }
-        favicon.href = settings.faviconUrl;
       }
     }
   }, [settings, isLoading]);

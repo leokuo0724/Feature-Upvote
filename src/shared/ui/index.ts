@@ -13,3 +13,4 @@ export * from "./select";
 export * from "./label";
 export * from "./label-tag";
 export * from "./label-selector";
+export * from "./language-switcher";

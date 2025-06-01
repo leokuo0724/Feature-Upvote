@@ -3,6 +3,7 @@
 import React, { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Plus, Filter, SortAsc, SortDesc, ChevronDown } from "lucide-react";
+import { useTranslations } from "next-intl";
 import {
   Tabs,
   TabsContent,
@@ -44,76 +45,78 @@ type TabGroup = "all" | "open" | "in-progress" | "done" | "archived";
 
 type TabOption = {
   value: TabGroup;
-  label: string;
+  labelKey: string;
   statuses: FeatureRequestStatus[];
   adminOnly?: boolean;
 };
 
-const tabOptions: TabOption[] = [
-  {
-    value: "all",
-    label: "All",
-    statuses: PUBLIC_STATUSES, // Exclude archived from "all"
-  },
-  {
-    value: "open",
-    label: "Open",
-    statuses: ["Open", "Considering", "Will Do"],
-  },
-  {
-    value: "in-progress",
-    label: "In Progress",
-    statuses: ["In Progress"],
-  },
-  {
-    value: "done",
-    label: "Done",
-    statuses: ["Completed", "Won't Do"],
-  },
-  {
-    value: "archived",
-    label: "Archived",
-    statuses: [ARCHIVED_STATUS],
-    adminOnly: true,
-  },
-];
-
 type SortOption = {
   value: string;
-  label: string;
+  labelKey: string;
   icon: React.ComponentType<{ className?: string }>;
   sort: FeatureRequestSort;
 };
-
-const sortOptions: SortOption[] = [
-  {
-    value: "upvotes",
-    label: "Most Upvoted",
-    icon: SortDesc,
-    sort: { field: "votes", direction: "desc" },
-  },
-  {
-    value: "createdAt",
-    label: "Newest First",
-    icon: SortDesc,
-    sort: { field: "createdAt", direction: "desc" },
-  },
-  {
-    value: "createdAt_asc",
-    label: "Oldest First",
-    icon: SortAsc,
-    sort: { field: "createdAt", direction: "asc" },
-  },
-];
 
 function FeatureRequestsContent() {
   const { user } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const t = useTranslations();
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingFeatureRequest, setEditingFeatureRequest] =
     useState<FeatureRequest | null>(null);
   const [sortBy, setSortBy] = useState<string>("upvotes");
+
+  // Define tab options with translation keys
+  const tabOptions: TabOption[] = [
+    {
+      value: "all",
+      labelKey: "common.all",
+      statuses: PUBLIC_STATUSES, // Exclude archived from "all"
+    },
+    {
+      value: "open",
+      labelKey: "common.open",
+      statuses: ["Open", "Considering", "Will Do"],
+    },
+    {
+      value: "in-progress",
+      labelKey: "feature.status.In Progress",
+      statuses: ["In Progress"],
+    },
+    {
+      value: "done",
+      labelKey: "feature.status.Completed",
+      statuses: ["Completed", "Won't Do"],
+    },
+    {
+      value: "archived",
+      labelKey: "feature.status.Archived",
+      statuses: [ARCHIVED_STATUS],
+      adminOnly: true,
+    },
+  ];
+
+  const sortOptions: SortOption[] = [
+    {
+      value: "upvotes",
+      labelKey: "feature.details.votes",
+      icon: SortDesc,
+      sort: { field: "votes", direction: "desc" },
+    },
+    {
+      value: "createdAt",
+      labelKey: "common.newest",
+      icon: SortDesc,
+      sort: { field: "createdAt", direction: "desc" },
+    },
+    {
+      value: "createdAt_asc",
+      labelKey: "common.oldest",
+      icon: SortAsc,
+      sort: { field: "createdAt", direction: "asc" },
+    },
+  ];
 
   // Get tab group from URL or default to "open"
   const tabFromUrl = searchParams.get("tab") as TabGroup | null;
@@ -224,7 +227,8 @@ function FeatureRequestsContent() {
   };
 
   const getSortLabel = () => {
-    return sortOptions.find((opt) => opt.value === sortBy)?.label || "Sort";
+    const option = sortOptions.find((opt) => opt.value === sortBy);
+    return option ? t(option.labelKey) : t("common.sort");
   };
 
   const getTabCount = (tabValue: TabGroup) => {
@@ -232,7 +236,8 @@ function FeatureRequestsContent() {
   };
 
   const getCurrentTabLabel = () => {
-    return currentTabOption?.label || "All";
+    const option = currentTabOption;
+    return option ? t(option.labelKey) : t("common.all");
   };
 
   return (
@@ -242,11 +247,9 @@ function FeatureRequestsContent() {
         <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold text-foreground mb-2">
-              Feature Requests
+              {t("feature.title")}
             </h1>
-            <p className="text-muted-foreground">
-              Share your ideas and vote on features you'd like to see
-            </p>
+            <p className="text-muted-foreground">{t("feature.subtitle")}</p>
           </div>
 
           {user && (
@@ -255,7 +258,7 @@ function FeatureRequestsContent() {
               onClick={() => setShowCreateForm(true)}
             >
               <Plus className="h-4 w-4 mr-2" />
-              New Request
+              {t("feature.createNew")}
             </Button>
           )}
         </div>
@@ -284,7 +287,7 @@ function FeatureRequestsContent() {
                       value={option.value}
                       className="flex items-center gap-2"
                     >
-                      {option.label}
+                      {t(option.labelKey)}
                       <Badge variant="outline" className="ml-1 text-xs">
                         {getTabCount(option.value)}
                       </Badge>
@@ -311,7 +314,7 @@ function FeatureRequestsContent() {
                   {visibleTabOptions.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
                       <div className="flex items-center gap-2">
-                        <span>{option.label}</span>
+                        <span>{t(option.labelKey)}</span>
                         <Badge variant="outline" className="text-xs">
                           {getTabCount(option.value)}
                         </Badge>
@@ -339,7 +342,7 @@ function FeatureRequestsContent() {
                   className="flex items-center gap-2"
                 >
                   {React.createElement(option.icon, { className: "h-4 w-4" })}
-                  {option.label}
+                  {t(option.labelKey)}
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
@@ -360,25 +363,24 @@ function FeatureRequestsContent() {
           ) : error ? (
             <div className="text-center py-12">
               <p className="text-destructive mb-4">
-                Error loading feature requests
+                {t("common.error")} loading feature requests
               </p>
               <Button
                 variant="outline"
                 onClick={() => window.location.reload()}
               >
-                Try Again
+                {t("buttons.refresh")}
               </Button>
             </div>
           ) : featureRequests.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-muted-foreground mb-4">
-                No {activeTab === "all" ? "" : activeTab.replace("-", " ")}{" "}
-                feature requests yet
+                {t("feature.noRequests")}
               </p>
               {user && (activeTab === "all" || activeTab === "open") && (
                 <Button onClick={() => setShowCreateForm(true)}>
                   <Plus className="h-4 w-4 mr-2" />
-                  Create the first one
+                  {t("feature.noRequestsDescription")}
                 </Button>
               )}
             </div>
@@ -405,7 +407,9 @@ function FeatureRequestsContent() {
                     onClick={() => fetchNextPage()}
                     disabled={isFetchingNextPage}
                   >
-                    {isFetchingNextPage ? "Loading..." : "Load More"}
+                    {isFetchingNextPage
+                      ? t("common.loading")
+                      : t("buttons.loadMore")}
                   </Button>
                 </div>
               )}

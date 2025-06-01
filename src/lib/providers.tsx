@@ -35,23 +35,25 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider
-        attribute="class"
-        defaultTheme="system"
-        enableSystem
-        disableTransitionOnChange
-      >
-        <SettingsProvider>
-          <AuthProvider>
-            <AppLoader>
-              <CustomThemeProvider>
-                {children}
-                <ReactQueryDevtools initialIsOpen={false} />
-              </CustomThemeProvider>
-            </AppLoader>
-          </AuthProvider>
-        </SettingsProvider>
-      </ThemeProvider>
+      <div suppressHydrationWarning>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <SettingsProvider>
+            <AuthProvider>
+              <AppLoader>
+                <CustomThemeProvider>
+                  {children}
+                  <ReactQueryDevtools initialIsOpen={false} />
+                </CustomThemeProvider>
+              </AppLoader>
+            </AuthProvider>
+          </SettingsProvider>
+        </ThemeProvider>
+      </div>
     </QueryClientProvider>
   );
 }

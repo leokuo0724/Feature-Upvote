@@ -1,0 +1,58 @@
+{
+  "title": "Feature Requests",
+  "subtitle": "Share your ideas and vote on features you'd like to see",
+  "createNew": "Create Feature Request",
+  "noRequests": "No feature requests found",
+  "noRequestsDescription": "Be the first to suggest a feature!",
+  "form": {
+    "title": "Title",
+    "titlePlaceholder": "Enter a descriptive title for your feature request",
+    "description": "Description",
+    "descriptionPlaceholder": "Describe your feature request in detail",
+    "labels": "Labels",
+    "labelsPlaceholder": "Select relevant labels",
+    "status": "Status",
+    "priority": "Priority"
+  },
+  "status": {
+    "Open": "Open",
+    "In Progress": "In Progress",
+    "Completed": "Completed",
+    "Won't Do": "Won't Do",
+    "Considering": "Considering",
+    "Will Do": "Will Do",
+    "Archived": "Archived"
+  },
+  "priority": {
+    "Low": "Low",
+    "Medium": "Medium",
+    "High": "High",
+    "Critical": "Critical"
+  },
+  "actions": {
+    "upvote": "Upvote",
+    "downvote": "Downvote",
+    "comment": "Comment",
+    "share": "Share",
+    "report": "Report"
+  },
+  "details": {
+    "votes": "votes",
+    "vote": "vote",
+    "comments": "comments",
+    "comment": "comment",
+    "createdBy": "Created by",
+    "createdAt": "Created at",
+    "updatedAt": "Updated at"
+  },
+  "messages": {
+    "createSuccess": "Feature request created successfully!",
+    "updateSuccess": "Feature request updated successfully!",
+    "deleteSuccess": "Feature request deleted successfully!",
+    "voteSuccess": "Vote recorded successfully!",
+    "createError": "Failed to create feature request",
+    "updateError": "Failed to update feature request",
+    "deleteError": "Failed to delete feature request",
+    "voteError": "Failed to record vote"
+  }
+}

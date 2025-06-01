@@ -1,0 +1,58 @@
+{
+  "title": "功能請求",
+  "subtitle": "分享您的想法並為您希望看到的功能投票",
+  "createNew": "創建功能請求",
+  "noRequests": "未找到功能請求",
+  "noRequestsDescription": "成為第一個建議功能的人！",
+  "form": {
+    "title": "標題",
+    "titlePlaceholder": "為您的功能請求輸入描述性標題",
+    "description": "描述",
+    "descriptionPlaceholder": "詳細描述您的功能請求",
+    "labels": "標籤",
+    "labelsPlaceholder": "選擇相關標籤",
+    "status": "狀態",
+    "priority": "優先級"
+  },
+  "status": {
+    "Open": "開放",
+    "In Progress": "進行中",
+    "Completed": "已完成",
+    "Won't Do": "不會執行",
+    "Considering": "考慮中",
+    "Will Do": "將會執行",
+    "Archived": "已歸檔"
+  },
+  "priority": {
+    "Low": "低",
+    "Medium": "中",
+    "High": "高",
+    "Critical": "緊急"
+  },
+  "actions": {
+    "upvote": "支持",
+    "downvote": "反對",
+    "comment": "評論",
+    "share": "分享",
+    "report": "舉報"
+  },
+  "details": {
+    "votes": "最多票優先",
+    "vote": "票",
+    "comments": "評論",
+    "comment": "評論",
+    "createdBy": "創建者",
+    "createdAt": "創建時間",
+    "updatedAt": "更新時間"
+  },
+  "messages": {
+    "createSuccess": "功能請求創建成功！",
+    "updateSuccess": "功能請求更新成功！",
+    "deleteSuccess": "功能請求刪除成功！",
+    "voteSuccess": "投票記錄成功！",
+    "createError": "創建功能請求失敗",
+    "updateError": "更新功能請求失敗",
+    "deleteError": "刪除功能請求失敗",
+    "voteError": "記錄投票失敗"
+  }
+}
