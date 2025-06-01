@@ -35,7 +35,4 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# ai prompts
-/docs
-
 firestore-debug.log
