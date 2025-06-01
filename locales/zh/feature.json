@@ -34,16 +34,19 @@
     "downvote": "反對",
     "comment": "評論",
     "share": "分享",
-    "report": "舉報"
+    "report": "舉報",
+    "edit": "編輯",
+    "delete": "刪除",
+    "back": "返回功能請求"
   },
   "details": {
     "votes": "最多票優先",
     "vote": "票",
     "comments": "評論",
     "comment": "評論",
-    "createdBy": "創建者",
-    "createdAt": "創建時間",
-    "updatedAt": "更新時間"
+    "createdBy": "由",
+    "createdAt": "創建於",
+    "updatedAt": "更新於"
   },
   "messages": {
     "createSuccess": "功能請求創建成功！",
@@ -54,5 +57,25 @@
     "updateError": "更新功能請求失敗",
     "deleteError": "刪除功能請求失敗",
     "voteError": "記錄投票失敗"
+  },
+  "notFound": {
+    "title": "未找到功能請求",
+    "message": "您要查找的功能請求不存在或已被刪除。",
+    "backButton": "返回功能請求"
+  },
+  "confirmDelete": "您確定要刪除此功能請求嗎？",
+  "comments": {
+    "title": "評論",
+    "loading": "載入評論中...",
+    "noComments": "尚無評論。成為第一個評論的人！",
+    "addComment": "新增評論...",
+    "postComment": "發表評論",
+    "posting": "發表中...",
+    "update": "更新",
+    "updating": "更新中...",
+    "cancel": "取消",
+    "loadMore": "載入更多評論",
+    "loading": "載入中...",
+    "loginPrompt": "請登入以新增評論"
   }
 }

@@ -34,16 +34,19 @@
     "downvote": "Downvote",
     "comment": "Comment",
     "share": "Share",
-    "report": "Report"
+    "report": "Report",
+    "edit": "Edit",
+    "delete": "Delete",
+    "back": "Back to Feature Requests"
   },
   "details": {
     "votes": "votes",
     "vote": "vote",
     "comments": "comments",
     "comment": "comment",
-    "createdBy": "Created by",
-    "createdAt": "Created at",
-    "updatedAt": "Updated at"
+    "createdBy": "by",
+    "createdAt": "Created",
+    "updatedAt": "Updated"
   },
   "messages": {
     "createSuccess": "Feature request created successfully!",
@@ -54,5 +57,25 @@
     "updateError": "Failed to update feature request",
     "deleteError": "Failed to delete feature request",
     "voteError": "Failed to record vote"
+  },
+  "notFound": {
+    "title": "Feature Request Not Found",
+    "message": "The feature request you're looking for doesn't exist or has been removed.",
+    "backButton": "Back to Feature Requests"
+  },
+  "confirmDelete": "Are you sure you want to delete this feature request?",
+  "comments": {
+    "title": "Comments",
+    "loading": "Loading comments...",
+    "noComments": "No comments yet. Be the first to comment!",
+    "addComment": "Add a comment...",
+    "postComment": "Post Comment",
+    "posting": "Posting...",
+    "update": "Update",
+    "updating": "Updating...",
+    "cancel": "Cancel",
+    "loadMore": "Load More Comments",
+    "loading": "Loading...",
+    "loginPrompt": "Please log in to add comments"
   }
 }

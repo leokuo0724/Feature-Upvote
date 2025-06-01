@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { formatDistanceToNow } from "date-fns";
+import { useTranslations } from "next-intl";
 import {
   MessageCircle,
   MoreHorizontal,
@@ -45,6 +46,7 @@ interface CommentItemProps {
 
 function CommentItem({ comment, onEdit, onDelete }: CommentItemProps) {
   const { user } = useAuth();
+  const t = useTranslations("feature");
   const canEdit = user && (user.isAdmin || user.uid === comment.authorId);
   const canDelete = user && (user.isAdmin || user.uid === comment.authorId);
 
@@ -88,7 +90,7 @@ function CommentItem({ comment, onEdit, onDelete }: CommentItemProps) {
                 {canEdit && (
                   <DropdownMenuItem onClick={() => onEdit(comment)}>
                     <Edit className="mr-2 h-3 w-3" />
-                    Edit
+                    {t("actions.edit")}
                   </DropdownMenuItem>
                 )}
                 {canDelete && (
@@ -99,7 +101,7 @@ function CommentItem({ comment, onEdit, onDelete }: CommentItemProps) {
                       className="text-destructive focus:text-destructive"
                     >
                       <Trash2 className="mr-2 h-3 w-3" />
-                      Delete
+                      {t("actions.delete")}
                     </DropdownMenuItem>
                   </>
                 )}
@@ -118,6 +120,7 @@ function CommentItem({ comment, onEdit, onDelete }: CommentItemProps) {
 
 export function CommentList({ featureRequestId }: CommentListProps) {
   const { user } = useAuth();
+  const t = useTranslations("feature");
   const [newComment, setNewComment] = useState("");
   const [editingComment, setEditingComment] = useState<Comment | null>(null);
   const [editContent, setEditContent] = useState("");
@@ -201,10 +204,10 @@ export function CommentList({ featureRequestId }: CommentListProps) {
         <CardContent className="p-6">
           <div className="flex items-center gap-2 mb-4">
             <MessageCircle className="h-5 w-5" />
-            <h3 className="font-semibold">Comments</h3>
+            <h3 className="font-semibold">{t("comments.title")}</h3>
           </div>
           <div className="text-center text-muted-foreground py-8">
-            Loading comments...
+            {t("comments.loading")}
           </div>
         </CardContent>
       </Card>
@@ -216,7 +219,9 @@ export function CommentList({ featureRequestId }: CommentListProps) {
       <CardHeader>
         <div className="flex items-center gap-2">
           <MessageCircle className="h-5 w-5" />
-          <h3 className="font-semibold">Comments ({comments.length})</h3>
+          <h3 className="font-semibold">
+            {t("comments.title")} ({comments.length})
+          </h3>
         </div>
       </CardHeader>
 
@@ -240,7 +245,7 @@ export function CommentList({ featureRequestId }: CommentListProps) {
 
             <div className="flex-1 space-y-2">
               <Textarea
-                placeholder="Add a comment..."
+                placeholder={t("comments.addComment")}
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 rows={3}
@@ -253,7 +258,9 @@ export function CommentList({ featureRequestId }: CommentListProps) {
                   size="sm"
                 >
                   <Send className="h-4 w-4 mr-2" />
-                  {createComment.isPending ? "Posting..." : "Post Comment"}
+                  {createComment.isPending
+                    ? t("comments.posting")
+                    : t("comments.postComment")}
                 </Button>
               </div>
             </div>
@@ -264,7 +271,7 @@ export function CommentList({ featureRequestId }: CommentListProps) {
         <div className="space-y-4">
           {comments.length === 0 ? (
             <div className="text-center text-muted-foreground py-8">
-              No comments yet. Be the first to comment!
+              {t("comments.noComments")}
             </div>
           ) : (
             comments.map((comment) => (
@@ -296,7 +303,7 @@ export function CommentList({ featureRequestId }: CommentListProps) {
                           size="sm"
                           onClick={handleCancelEdit}
                         >
-                          Cancel
+                          {t("comments.cancel")}
                         </Button>
                         <Button
                           onClick={handleUpdateComment}
@@ -305,7 +312,9 @@ export function CommentList({ featureRequestId }: CommentListProps) {
                           }
                           size="sm"
                         >
-                          {updateComment.isPending ? "Updating..." : "Update"}
+                          {updateComment.isPending
+                            ? t("comments.updating")
+                            : t("comments.update")}
                         </Button>
                       </div>
                     </div>
@@ -330,7 +339,9 @@ export function CommentList({ featureRequestId }: CommentListProps) {
               onClick={() => fetchNextPage()}
               disabled={isFetchingNextPage}
             >
-              {isFetchingNextPage ? "Loading..." : "Load More Comments"}
+              {isFetchingNextPage
+                ? t("comments.loading")
+                : t("comments.loadMore")}
             </Button>
           </div>
         )}
@@ -338,7 +349,7 @@ export function CommentList({ featureRequestId }: CommentListProps) {
         {/* Login prompt for non-authenticated users */}
         {!user && (
           <div className="text-center text-muted-foreground py-4 border-t">
-            Please log in to add comments
+            {t("comments.loginPrompt")}
           </div>
         )}
       </CardContent>

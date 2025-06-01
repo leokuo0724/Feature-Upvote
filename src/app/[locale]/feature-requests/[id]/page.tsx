@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { formatDistanceToNow } from "date-fns";
+import { useTranslations } from "next-intl";
 import {
   ChevronUp,
   ArrowLeft,
@@ -53,6 +54,7 @@ export default function FeatureRequestDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { user } = useAuth();
+  const t = useTranslations("feature");
   const [showEditForm, setShowEditForm] = useState(false);
   const [isUpvoting, setIsUpvoting] = useState(false);
 
@@ -84,14 +86,11 @@ export default function FeatureRequestDetailPage() {
     return (
       <div className="container mx-auto py-8">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-2xl font-bold mb-4">Feature Request Not Found</h1>
-          <p className="text-muted-foreground mb-6">
-            The feature request you're looking for doesn't exist or has been
-            removed.
-          </p>
+          <h1 className="text-2xl font-bold mb-4">{t("notFound.title")}</h1>
+          <p className="text-muted-foreground mb-6">{t("notFound.message")}</p>
           <Button onClick={() => router.push("/feature-requests")}>
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Feature Requests
+            {t("notFound.backButton")}
           </Button>
         </div>
       </div>
@@ -123,7 +122,7 @@ export default function FeatureRequestDetailPage() {
   };
 
   const handleDelete = async () => {
-    if (!confirm("Are you sure you want to delete this feature request?")) {
+    if (!confirm(t("confirmDelete"))) {
       return;
     }
 
@@ -158,7 +157,7 @@ export default function FeatureRequestDetailPage() {
           className="mb-0 sm:mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Feature Requests
+          {t("actions.back")}
         </Button>
 
         {/* Main Content */}
@@ -203,7 +202,7 @@ export default function FeatureRequestDetailPage() {
                           {canEdit && (
                             <DropdownMenuItem onClick={handleEdit}>
                               <Edit className="mr-2 h-4 w-4" />
-                              Edit
+                              {t("actions.edit")}
                             </DropdownMenuItem>
                           )}
                           {canDelete && (
@@ -214,7 +213,7 @@ export default function FeatureRequestDetailPage() {
                                 className="text-destructive focus:text-destructive"
                               >
                                 <Trash2 className="mr-2 h-4 w-4" />
-                                Delete
+                                {t("actions.delete")}
                               </DropdownMenuItem>
                             </>
                           )}
@@ -227,7 +226,9 @@ export default function FeatureRequestDetailPage() {
                 <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
                   <div className="flex items-center gap-1">
                     <User className="h-4 w-4" />
-                    <span>by {featureRequest.authorName}</span>
+                    <span>
+                      {t("details.createdBy")} {featureRequest.authorName}
+                    </span>
                   </div>
                   <div className="flex items-center gap-1">
                     <Calendar className="h-4 w-4" />
@@ -243,7 +244,7 @@ export default function FeatureRequestDetailPage() {
                   <Badge
                     variant={statusColors[featureRequest.status] || "default"}
                   >
-                    {featureRequest.status}
+                    {t(`status.${featureRequest.status}`)}
                   </Badge>
 
                   {featureRequest.labels.map((labelId) => (
@@ -276,14 +277,15 @@ export default function FeatureRequestDetailPage() {
               <div>
                 <p className="font-medium">{featureRequest.authorName}</p>
                 <p className="text-sm text-muted-foreground">
-                  Created{" "}
+                  {t("details.createdAt")}{" "}
                   {formatDistanceToNow(featureRequest.createdAt, {
                     addSuffix: true,
                   })}
                   {featureRequest.updatedAt.getTime() !==
                     featureRequest.createdAt.getTime() && (
                     <span>
-                      {" • Updated "}
+                      {" • "}
+                      {t("details.updatedAt")}{" "}
                       {formatDistanceToNow(featureRequest.updatedAt, {
                         addSuffix: true,
                       })}
