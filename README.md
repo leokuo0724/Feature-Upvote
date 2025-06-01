@@ -11,13 +11,19 @@
 
 ## English
 
-A modern feature request and voting platform that enables product teams to quickly collect and manage user feedback.
+A modern feature request and voting platform built with **Firebase + Vercel** for effortless deployment. Get your feedback platform live in minutes, not hours.
 
 ### 🎯 Target Users
 
 **Product Managers** and **Developers** who want to quickly deploy a feature voting platform for their products
 
 ### ⚡ Quick Deploy
+
+**Why Firebase + Vercel?**
+
+- 🔥 **Firebase**: Zero backend setup - authentication, database, and hosting ready out-of-the-box
+- ⚡ **Vercel**: One-click deployment with automatic CI/CD
+- 🧠 **No-Brain Setup**: Copy, paste, deploy - that's it!
 
 ```bash
 # 1. Clone project
@@ -34,7 +40,7 @@ pnpm install
 # See: docs/DEPLOYMENT.md
 ```
 
-**⏱️ Total time: ~10 minutes to go live**
+**⏱️ Total time: ~10 minutes from zero to production**
 
 ### ✨ Core Features
 
@@ -66,6 +72,13 @@ pnpm install
 
 ### 🛠 Tech Stack
 
+#### Why This Stack?
+
+- **🚀 Zero Configuration**: Firebase handles all backend complexity
+- **⚡ Instant Deployment**: Vercel's edge network for global performance
+- **💰 Cost Effective**: Both platforms offer generous free tiers
+- **🔧 Developer Friendly**: Focus on features, not infrastructure
+
 #### Frontend
 
 - **Next.js 14** - App Router + Server Components
@@ -74,18 +87,19 @@ pnpm install
 - **shadcn/ui** - High-quality UI components
 - **TanStack Query** - Efficient data management
 
-#### Backend Services
+#### Backend Services (Firebase)
 
-- **Firebase Auth** - Secure user authentication
-- **Firestore** - Real-time database
+- **Firebase Auth** - Secure user authentication (Google OAuth ready)
+- **Firestore** - Real-time NoSQL database
 - **Security Rules** - Fine-grained permission control
+- **Analytics** - Built-in user behavior tracking
 
-#### Developer Experience
+#### Deployment (Vercel)
 
-- **Feature-Sliced Design** - Maintainable code architecture
-- **Internationalization** - Bilingual Chinese/English support
-- **TypeScript** - Development-time error checking
-- **ESLint + Prettier** - Code quality assurance
+- **Edge Functions** - Server-side rendering at the edge
+- **Automatic CI/CD** - Deploy on every Git push
+- **Global CDN** - Lightning-fast worldwide access
+- **Zero Config** - Works perfectly with Next.js out of the box
 
 ### 🚀 Deployment Options
 
@@ -131,10 +145,12 @@ pnpm type-check   # Type checking
 
 ### 🎨 Customization Highlights
 
-- **🎯 Zero-Code Branding** - Complete through admin panel
+- **🎯 Zero-Code Branding** - Complete through admin panel, no code changes needed
 - **🌈 Live Theme Preview** - Changes take effect immediately
 - **📱 Responsive Design** - Perfect adaptation to all devices
 - **🌍 Multi-language Support** - Built-in Chinese/English switching
+- **🔥 Firebase Magic** - Real-time updates across all users instantly
+- **⚡ Vercel Power** - Global edge deployment for lightning speed
 
 ### 🤝 Contributing
 
@@ -152,13 +168,19 @@ MIT License - See [LICENSE](LICENSE) for details
 
 ## 中文
 
-一個現代化的功能請求和投票平台，讓產品團隊能夠快速收集和管理用戶反饋。
+基於 **Firebase + Vercel** 打造的現代化功能請求投票平台，讓你輕鬆部署。幾分鐘內就能讓你的反饋平台上線，不用幾小時。
 
 ### 🎯 目標使用者
 
 **產品經理** 和 **開發者** 希望快速為自己的產品部署一個功能投票平台
 
 ### ⚡ 快速部署
+
+**為什麼選擇 Firebase + Vercel？**
+
+- 🔥 **Firebase**：零後端設置 - 認證、資料庫、託管開箱即用
+- ⚡ **Vercel**：一鍵部署，自動 CI/CD
+- 🧠 **快速設置**：複製、貼上、部署 - 就這麼簡單！
 
 ```bash
 # 1. 複製專案
@@ -175,7 +197,7 @@ pnpm install
 # 參考：docs/DEPLOYMENT.md
 ```
 
-**⏱️ 總時間：約 10 分鐘即可上線**
+**⏱️ 總時間：從零到正式環境約 10 分鐘**
 
 ### ✨ 核心功能
 
@@ -207,6 +229,13 @@ pnpm install
 
 ### 🛠 技術架構
 
+#### 為什麼選擇這個技術棧？
+
+- **🚀 零配置**：Firebase 處理所有後端複雜性
+- **⚡ 即時部署**：Vercel 邊緣網路提供全球性能
+- **💰 成本效益**：兩個平台都提供慷慨的免費額度
+- **🔧 開發者友好**：專注於功能，而非基礎設施
+
 #### 前端技術
 
 - **Next.js 14** - App Router + Server Components
@@ -215,18 +244,19 @@ pnpm install
 - **shadcn/ui** - 高質量 UI 組件
 - **TanStack Query** - 高效數據管理
 
-#### 後端服務
+#### 後端服務 (Firebase)
 
-- **Firebase Auth** - 安全的用戶認證
-- **Firestore** - 實時數據庫
+- **Firebase Auth** - 安全的用戶認證（Google OAuth 開箱即用）
+- **Firestore** - 實時 NoSQL 資料庫
 - **Security Rules** - 細粒度權限控制
+- **Analytics** - 內建用戶行為追蹤
 
-#### 開發體驗
+#### 部署平台 (Vercel)
 
-- **Feature-Sliced Design** - 可維護的代碼架構
-- **國際化支援** - 中英文雙語
-- **TypeScript** - 開發時錯誤檢查
-- **ESLint + Prettier** - 代碼品質保證
+- **Edge Functions** - 邊緣伺服器端渲染
+- **自動 CI/CD** - 每次 Git 推送自動部署
+- **全球 CDN** - 全球閃電般快速訪問
+- **零配置** - 與 Next.js 完美搭配開箱即用
 
 ### 🚀 部署選項
 
@@ -272,10 +302,12 @@ pnpm type-check   # 類型檢查
 
 ### 🎨 自訂功能亮點
 
-- **🎯 零代碼品牌化** - 通過管理面板即可完成
+- **🎯 零代碼品牌化** - 通過管理面板即可完成，無需修改代碼
 - **🌈 實時主題預覽** - 修改即時生效
 - **📱 響應式設計** - 完美適配各種設備
 - **🌍 多語言支援** - 內建中英文切換
+- **🔥 Firebase 魔法** - 所有用戶即時同步更新
+- **⚡ Vercel 威力** - 全球邊緣部署閃電般速度
 
 ### 🤝 貢獻指南
 
