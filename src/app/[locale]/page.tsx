@@ -18,7 +18,7 @@ export default function HomePage() {
         {/* Hero Image */}
         <div className="flex justify-center mt-6 sm:mt-0">
           <Image
-            src="/home.png"
+            src="/images/home.png"
             alt="Feature Upvote Hero"
             width={400}
             height={300}

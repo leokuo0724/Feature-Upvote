@@ -2,6 +2,8 @@
 
 [English](#english) | [中文](#中文)
 
+![Cover](public/images/readme/banner.png)
+
 ![Feature Upvote](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript)
 ![Firebase](https://img.shields.io/badge/Firebase-9-orange?style=for-the-badge&logo=firebase)
