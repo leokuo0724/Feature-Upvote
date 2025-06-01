@@ -9,6 +9,12 @@
 ![Firebase](https://img.shields.io/badge/Firebase-9-orange?style=for-the-badge&logo=firebase)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3-38B2AC?style=for-the-badge&logo=tailwind-css)
 
+## 🚀 Live Demo
+
+**Try it now:** https://feature-upvote.vercel.app/
+
+_Experience the full platform with real-time voting, comments, and admin features_
+
 ---
 
 ## English
