@@ -81,7 +81,7 @@ export function CreateFeatureRequestForm({
     },
   });
 
-  // 初始化編輯模式的數據
+  // Initialize edit mode data
   useEffect(() => {
     if (editData && open) {
       reset({
@@ -91,7 +91,6 @@ export function CreateFeatureRequestForm({
       setLabelIds(editData.labels || []);
       setSelectedStatus(editData.status);
     } else if (!open) {
-      // 關閉時重置表單
       reset({
         title: "",
         description: "",

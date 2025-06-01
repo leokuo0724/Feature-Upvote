@@ -1,5 +1,5 @@
 export interface AnalyticsCache {
-  id: string; // 例如 "active_users_daily"
+  id: string;
   type: "active_users" | "total_requests" | "total_comments";
   period: "daily" | "weekly" | "monthly";
   value: number;

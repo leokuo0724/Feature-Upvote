@@ -125,7 +125,7 @@ export function useCreateUser() {
   });
 }
 
-// 新增：用於登入時的 upsert mutation
+// Upsert mutation for logging in
 export function useUpsertUserOnLogin() {
   const queryClient = useQueryClient();
 

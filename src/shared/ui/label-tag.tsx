@@ -12,7 +12,6 @@ interface LabelTagProps {
 export function LabelTag({ labelId, className = "" }: LabelTagProps) {
   const { data: label, isLoading } = useLabel(labelId);
 
-  // 如果找不到 label 或正在載入，不顯示任何內容
   if (isLoading || !label) {
     return null;
   }
