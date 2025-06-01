@@ -10,9 +10,8 @@ import {
   updateUser,
   upsertUserOnLogin,
   checkIsAdmin,
-  addAdminEmail,
-  removeAdminEmail,
-  getAdminEmails,
+  updateUserAdminStatus,
+  getAdminUsers,
   getUserFeatureRequests,
   getUserVotedFeatureRequests,
   getUserStats,
@@ -23,7 +22,7 @@ import { User } from "@/shared/types";
 export const userKeys = {
   all: ["users"] as const,
   user: (uid: string) => [...userKeys.all, uid] as const,
-  adminEmails: () => [...userKeys.all, "adminEmails"] as const,
+  adminUsers: () => [...userKeys.all, "adminUsers"] as const,
   isAdmin: (email: string) => [...userKeys.all, "isAdmin", email] as const,
   details: () => [...userKeys.all, "detail"] as const,
   detail: (id: string) => [...userKeys.details(), id] as const,
@@ -50,14 +49,6 @@ export function useIsAdmin(email: string | null) {
     queryFn: () => checkIsAdmin(email!),
     enabled: !!email,
     staleTime: 10 * 60 * 1000, // 10 minutes - admin status doesn't change often
-  });
-}
-
-export function useAdminEmails() {
-  return useQuery({
-    queryKey: userKeys.adminEmails(),
-    queryFn: getAdminEmails,
-    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 }
 
@@ -102,6 +93,14 @@ export function useUserStats(userId: string) {
     queryKey: userKeys.stats(userId),
     queryFn: () => getUserStats(userId),
     enabled: !!userId,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+}
+
+export function useAdminUsers() {
+  return useQuery({
+    queryKey: userKeys.adminUsers(),
+    queryFn: getAdminUsers,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 }
@@ -162,25 +161,25 @@ export function useUpdateUser() {
   });
 }
 
-export function useAddAdminEmail() {
+export function useUpdateUserAdminStatus() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ email, addedBy }: { email: string; addedBy: string }) =>
-      addAdminEmail(email, addedBy),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: userKeys.adminEmails() });
-    },
-  });
-}
-
-export function useRemoveAdminEmail() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: removeAdminEmail,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: userKeys.adminEmails() });
+    mutationFn: ({
+      uid,
+      isAdmin,
+      updatedBy,
+    }: {
+      uid: string;
+      isAdmin: boolean;
+      updatedBy: string;
+    }) => updateUserAdminStatus(uid, isAdmin, updatedBy),
+    onSuccess: (_, { uid }) => {
+      // Invalidate related queries
+      queryClient.invalidateQueries({ queryKey: userKeys.user(uid) });
+      queryClient.invalidateQueries({ queryKey: userKeys.adminUsers() });
+      // Invalidate all isAdmin queries since we don't know which email this user has
+      queryClient.invalidateQueries({ queryKey: userKeys.all });
     },
   });
 }

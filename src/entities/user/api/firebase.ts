@@ -133,38 +133,42 @@ export async function updateUser(
 export async function checkIsAdmin(email: string): Promise<boolean> {
   if (!email) return false;
 
-  const adminEmailRef = doc(db, COLLECTIONS.ADMIN_EMAILS, email);
-  const adminEmailSnap = await getDoc(adminEmailRef);
-
-  return adminEmailSnap.exists();
-}
-
-export async function addAdminEmail(
-  email: string,
-  addedBy: string
-): Promise<void> {
-  const adminEmailRef = doc(db, COLLECTIONS.ADMIN_EMAILS, email);
-  await setDoc(adminEmailRef, {
-    email,
-    addedBy,
-    addedAt: serverTimestamp(),
-  });
-}
-
-export async function removeAdminEmail(email: string): Promise<void> {
-  const adminEmailRef = doc(db, COLLECTIONS.ADMIN_EMAILS, email);
-  await updateDoc(adminEmailRef, {
-    deletedAt: serverTimestamp(),
-  });
-}
-
-export async function getAdminEmails(): Promise<string[]> {
-  const q = query(collection(db, COLLECTIONS.ADMIN_EMAILS));
+  // Query users collection to find user with this email and check isAdmin field
+  const q = query(
+    collection(db, COLLECTIONS.USERS),
+    where("email", "==", email)
+  );
   const querySnapshot = await getDocs(q);
 
-  return querySnapshot.docs
-    .filter((doc) => !doc.data().deletedAt)
-    .map((doc) => doc.data().email);
+  if (querySnapshot.empty) return false;
+
+  const userDoc = querySnapshot.docs[0];
+  const userData = userDoc.data();
+  return userData.isAdmin || false;
+}
+
+// Function to update user's admin status
+export async function updateUserAdminStatus(
+  uid: string,
+  isAdmin: boolean,
+  updatedBy: string
+): Promise<void> {
+  const userRef = doc(db, COLLECTIONS.USERS, uid);
+  await updateDoc(userRef, {
+    isAdmin,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+// Function to get all admin users
+export async function getAdminUsers(): Promise<User[]> {
+  const q = query(
+    collection(db, COLLECTIONS.USERS),
+    where("isAdmin", "==", true)
+  );
+  const querySnapshot = await getDocs(q);
+
+  return querySnapshot.docs.map(convertFirestoreUserDoc);
 }
 
 // Get user's feature requests with pagination

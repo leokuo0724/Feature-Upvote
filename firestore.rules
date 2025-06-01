@@ -4,7 +4,8 @@ service cloud.firestore {
     // Helper function to check if user is admin
     function isAdmin() {
       return request.auth != null && 
-             exists(/databases/$(database)/documents/adminEmails/$(request.auth.token.email));
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
     }
     
     // Helper function to check if user is authenticated
@@ -21,18 +22,13 @@ service cloud.firestore {
     match /users/{userId} {
       // Anyone can read user profiles
       allow read: if true;
-      // Users can create/update their own profile
-      allow create, update: if isAuthenticated() && request.auth.uid == userId;
+      // Users can create/update their own profile, but cannot modify isAdmin field unless they are admin
+      allow create: if isAuthenticated() && request.auth.uid == userId && 
+                       (!('isAdmin' in request.resource.data) || !request.resource.data.isAdmin);
+      allow update: if isAuthenticated() && request.auth.uid == userId && 
+                       (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['isAdmin']) || isAdmin());
       // Only admins can delete users
       allow delete: if isAdmin();
-    }
-
-    // Admin emails collection
-    match /adminEmails/{email} {
-      // Anyone can read (needed for admin checks)
-      allow read: if true;
-      // Only admins can manage admin list
-      allow write: if isAdmin();
     }
 
     // Settings collection

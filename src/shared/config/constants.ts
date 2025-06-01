@@ -41,7 +41,6 @@ export const COLLECTIONS = {
   USERS: "users",
   FEATURE_REQUESTS: "featureRequests",
   COMMENTS: "comments",
-  ADMIN_EMAILS: "adminEmails",
   LABELS: "labels",
   ANALYTICS: "analytics",
   SETTINGS: "settings",

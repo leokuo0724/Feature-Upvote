@@ -2,6 +2,10 @@
   "title": "Admin Panel",
   "subtitle": "Manage your Feature Upvote platform",
   "features": {
+    "userManagement": {
+      "title": "User Management",
+      "description": "Manage admin users and permissions"
+    },
     "labelManagement": {
       "title": "Label Management",
       "description": "Create and manage labels for feature requests"
@@ -38,6 +42,54 @@
       "title": "Access Denied",
       "message": "You need admin privileges to access this page."
     }
+  },
+  "users": {
+    "title": "User Management",
+    "description": "Manage admin users and their permissions",
+    "loading": "Loading users...",
+    "adminUsers": {
+      "title": "Admin Users",
+      "description": "Users with administrative privileges"
+    },
+    "noAdmins": {
+      "title": "No Admin Users",
+      "description": "There are currently no admin users in the system."
+    },
+    "currentUser": "You",
+    "table": {
+      "user": "User",
+      "email": "Email",
+      "joined": "Joined",
+      "lastLogin": "Last Login",
+      "actions": "Actions"
+    },
+    "actions": {
+      "promote": "Promote to Admin",
+      "demote": "Remove Admin"
+    },
+    "promoteDialog": {
+      "title": "Promote to Admin",
+      "description": "Are you sure you want to give admin privileges to {name}?",
+      "confirm": "Promote"
+    },
+    "demoteDialog": {
+      "title": "Remove Admin Privileges",
+      "description": "Are you sure you want to remove admin privileges from {name}?",
+      "confirm": "Remove Admin"
+    },
+    "success": {
+      "title": "Success",
+      "promoted": "{name} has been promoted to admin",
+      "demoted": "Admin privileges removed from {name}"
+    },
+    "error": {
+      "title": "Error",
+      "message": "Failed to update user permissions. Please try again."
+    }
+  },
+  "common": {
+    "cancel": "Cancel",
+    "loading": "Loading..."
   },
   "labels": {
     "title": "Label Management",

@@ -2,6 +2,10 @@
   "title": "管理面板",
   "subtitle": "管理您的功能投票平台",
   "features": {
+    "userManagement": {
+      "title": "使用者管理",
+      "description": "管理管理員使用者和權限"
+    },
     "labelManagement": {
       "title": "標籤管理",
       "description": "創建和管理功能請求的標籤"
@@ -38,6 +42,54 @@
       "title": "拒絕存取",
       "message": "您需要管理員權限才能存取此頁面。"
     }
+  },
+  "users": {
+    "title": "使用者管理",
+    "description": "管理管理員使用者和他們的權限",
+    "loading": "載入使用者中...",
+    "adminUsers": {
+      "title": "管理員使用者",
+      "description": "具有管理權限的使用者"
+    },
+    "noAdmins": {
+      "title": "沒有管理員使用者",
+      "description": "系統中目前沒有管理員使用者。"
+    },
+    "currentUser": "您",
+    "table": {
+      "user": "使用者",
+      "email": "電子郵件",
+      "joined": "加入時間",
+      "lastLogin": "最後登入",
+      "actions": "操作"
+    },
+    "actions": {
+      "promote": "提升為管理員",
+      "demote": "移除管理員"
+    },
+    "promoteDialog": {
+      "title": "提升為管理員",
+      "description": "您確定要給予 {name} 管理員權限嗎？",
+      "confirm": "提升"
+    },
+    "demoteDialog": {
+      "title": "移除管理員權限",
+      "description": "您確定要移除 {name} 的管理員權限嗎？",
+      "confirm": "移除管理員"
+    },
+    "success": {
+      "title": "成功",
+      "promoted": "{name} 已被提升為管理員",
+      "demoted": "已移除 {name} 的管理員權限"
+    },
+    "error": {
+      "title": "錯誤",
+      "message": "更新使用者權限失敗，請重試。"
+    }
+  },
+  "common": {
+    "cancel": "取消",
+    "loading": "載入中..."
   },
   "labels": {
     "title": "標籤管理",

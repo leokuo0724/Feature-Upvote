@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Settings, Tag, RefreshCw } from "lucide-react";
+import { Settings, Tag, RefreshCw, Crown } from "lucide-react";
 import { useTranslations } from "next-intl";
 import {
   Card,
@@ -19,6 +19,15 @@ import {
 } from "@/entities/analytics";
 
 const adminFeatures = [
+  {
+    title: "userManagement",
+    description: "userManagement",
+    icon: Crown,
+    href: "/admin/users",
+    color: "text-purple-600",
+    bgColor: "bg-purple-50",
+    disabled: false,
+  },
   {
     title: "labelManagement",
     description: "labelManagement",
