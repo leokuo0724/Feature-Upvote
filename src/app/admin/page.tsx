@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Settings, Tag, Users, BarChart3, RefreshCw } from "lucide-react";
+import { Settings, Tag, RefreshCw } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -227,21 +227,18 @@ export default function AdminPage() {
               value={activeUsers}
               isLoading={activeUsersLoading}
               error={activeUsersError}
-              onRefresh={() => refetchActiveUsers()}
             />
             <StatCard
               title="Total Feature Requests"
               value={totalFeatureRequests}
               isLoading={featureRequestsLoading}
               error={featureRequestsError}
-              onRefresh={() => refetchFeatureRequests()}
             />
             <StatCard
               title="Total Comments"
               value={totalComments}
               isLoading={commentsLoading}
               error={commentsError}
-              onRefresh={() => refetchComments()}
             />
           </div>
         </div>
