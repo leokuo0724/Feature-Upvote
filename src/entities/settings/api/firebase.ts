@@ -18,17 +18,8 @@ function convertFirestoreSettingsDoc(doc: any): AppSettings {
   return {
     projectName: data.projectName || DEFAULT_SETTINGS.projectName!,
     tagline: data.tagline || DEFAULT_SETTINGS.tagline!,
-    logoUrl: data.logoUrl,
-    faviconUrl: data.faviconUrl,
     primaryColor: data.primaryColor || DEFAULT_SETTINGS.primaryColor!,
     defaultTheme: data.defaultTheme || DEFAULT_SETTINGS.defaultTheme!,
-    customCss: data.customCss,
-    welcomeBanner: data.welcomeBanner,
-    footerContent: data.footerContent,
-    features: {
-      ...DEFAULT_SETTINGS.features!,
-      ...data.features,
-    },
     createdAt:
       data.createdAt instanceof Timestamp
         ? data.createdAt.toDate()
