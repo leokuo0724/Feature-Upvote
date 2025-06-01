@@ -16,7 +16,7 @@ export default function HomePage() {
     <div className="container mx-auto py-8">
       <div className="max-w-4xl mx-auto text-center space-y-8">
         {/* Hero Image */}
-        <div className="flex justify-center">
+        <div className="flex justify-center mt-6 sm:mt-0">
           <Image
             src="/home.png"
             alt="Feature Upvote Hero"
@@ -28,8 +28,10 @@ export default function HomePage() {
 
         {/* Content */}
         <div className="space-y-4">
-          <h1 className="text-5xl font-bold tracking-tight">
-            Welcome to {settings.projectName}
+          <h1 className="text-3xl sm:text-5xl font-bold tracking-tight">
+            {settings.projectName}
+            <br></br>
+            {t("home.upvotingPlatform")}
           </h1>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
             {settings.tagline}
@@ -37,7 +39,7 @@ export default function HomePage() {
           <div className="flex justify-center gap-4 pt-4">
             <Link href="/feature-requests">
               <Button size="lg" className="font-semibold px-8 py-4">
-                {t("feature.title")}
+                {t("home.exploreFeatureRequests")}
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>

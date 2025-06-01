@@ -96,12 +96,13 @@ export function Navigation() {
           </div>
 
           {/* Right side - Language switcher, Theme toggle and User menu */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center">
             {/* Language Switcher */}
             <LanguageSwitcher />
 
             {/* Theme Toggle */}
             <Button
+              className="mr-2"
               variant="ghost"
               size="sm"
               onClick={() => setTheme(theme === "light" ? "dark" : "light")}
