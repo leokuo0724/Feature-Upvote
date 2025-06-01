@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Settings, Tag, RefreshCw } from "lucide-react";
+import { useTranslations } from "next-intl";
 import {
   Card,
   CardContent,
@@ -19,8 +20,8 @@ import {
 
 const adminFeatures = [
   {
-    title: "Label Management",
-    description: "Create and manage labels for feature requests",
+    title: "labelManagement",
+    description: "labelManagement",
     icon: Tag,
     href: "/admin/labels",
     color: "text-blue-600",
@@ -28,8 +29,8 @@ const adminFeatures = [
     disabled: false,
   },
   {
-    title: "Settings",
-    description: "Configure platform settings and preferences",
+    title: "settings",
+    description: "settings",
     icon: Settings,
     href: "/admin/settings",
     color: "text-orange-600",
@@ -53,6 +54,8 @@ function StatCard({
   error,
   onRefresh,
 }: StatCardProps) {
+  const t = useTranslations("admin");
+
   return (
     <Card>
       <CardContent className="pt-4">
@@ -62,7 +65,7 @@ function StatCard({
               {isLoading ? (
                 <div className="animate-pulse bg-muted h-8 w-16 rounded mx-auto"></div>
               ) : error ? (
-                "Error"
+                t("overview.error")
               ) : (
                 value?.toLocaleString() || "0"
               )}
@@ -83,7 +86,9 @@ function StatCard({
           </div>
           <p className="text-sm text-muted-foreground">{title}</p>
           {error && (
-            <p className="text-xs text-destructive mt-1">Failed to load</p>
+            <p className="text-xs text-destructive mt-1">
+              {t("overview.failedToLoad")}
+            </p>
           )}
         </div>
       </CardContent>
@@ -93,6 +98,7 @@ function StatCard({
 
 export default function AdminPage() {
   const { user } = useAuth();
+  const t = useTranslations("admin");
 
   // Analytics queries
   const {
@@ -121,10 +127,10 @@ export default function AdminPage() {
     return (
       <div className="container mx-auto py-8">
         <div className="max-w-2xl mx-auto text-center">
-          <h1 className="text-2xl font-bold mb-4">Access Denied</h1>
-          <p className="text-muted-foreground">
-            You don't have permission to access this page.
-          </p>
+          <h1 className="text-2xl font-bold mb-4">
+            {t("access.denied.title")}
+          </h1>
+          <p className="text-muted-foreground">{t("access.denied.message")}</p>
         </div>
       </div>
     );
@@ -134,9 +140,11 @@ export default function AdminPage() {
     return (
       <div className="container mx-auto py-8">
         <div className="max-w-2xl mx-auto text-center">
-          <h1 className="text-2xl font-bold mb-4">Please Sign In</h1>
+          <h1 className="text-2xl font-bold mb-4">
+            {t("access.signInRequired.title")}
+          </h1>
           <p className="text-muted-foreground">
-            You need to sign in to access the admin panel.
+            {t("access.signInRequired.message")}
           </p>
         </div>
       </div>
@@ -148,10 +156,8 @@ export default function AdminPage() {
       <div className="max-w-6xl mx-auto space-y-8">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold">Admin Panel</h1>
-          <p className="text-muted-foreground mt-2">
-            Manage your Feature Upvote platform
-          </p>
+          <h1 className="text-3xl font-bold">{t("title")}</h1>
+          <p className="text-muted-foreground mt-2">{t("subtitle")}</p>
         </div>
 
         {/* Admin Features Grid */}
@@ -172,17 +178,17 @@ export default function AdminPage() {
                       </div>
                       <div>
                         <CardTitle className="text-lg">
-                          {feature.title}
+                          {t(`features.${feature.title}.title`)}
                         </CardTitle>
                         <CardDescription className="text-sm">
-                          Coming Soon
+                          {t("status.comingSoon")}
                         </CardDescription>
                       </div>
                     </div>
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-muted-foreground">
-                      {feature.description}
+                      {t(`features.${feature.description}.description`)}
                     </p>
                   </CardContent>
                 </Card>
@@ -199,17 +205,17 @@ export default function AdminPage() {
                       </div>
                       <div>
                         <CardTitle className="text-lg">
-                          {feature.title}
+                          {t(`features.${feature.title}.title`)}
                         </CardTitle>
                         <CardDescription className="text-sm">
-                          Manage & Configure
+                          {t("status.manageAndConfigure")}
                         </CardDescription>
                       </div>
                     </div>
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-muted-foreground">
-                      {feature.description}
+                      {t(`features.${feature.description}.description`)}
                     </p>
                   </CardContent>
                 </Card>
@@ -220,22 +226,22 @@ export default function AdminPage() {
 
         {/* Quick Stats */}
         <div className="mt-12">
-          <h2 className="text-xl font-semibold mb-4">Platform Overview</h2>
+          <h2 className="text-xl font-semibold mb-4">{t("overview.title")}</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <StatCard
-              title="Active Users (30 Days)"
+              title={t("overview.stats.activeUsers")}
               value={activeUsers}
               isLoading={activeUsersLoading}
               error={activeUsersError}
             />
             <StatCard
-              title="Total Feature Requests"
+              title={t("overview.stats.totalFeatureRequests")}
               value={totalFeatureRequests}
               isLoading={featureRequestsLoading}
               error={featureRequestsError}
             />
             <StatCard
-              title="Total Comments"
+              title={t("overview.stats.totalComments")}
               value={totalComments}
               isLoading={commentsLoading}
               error={commentsError}

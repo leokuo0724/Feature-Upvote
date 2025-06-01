@@ -17,6 +17,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
       home: (await import(`../../locales/${locale}/home.json`)).default,
       feature: (await import(`../../locales/${locale}/feature.json`)).default,
       auth: (await import(`../../locales/${locale}/auth.json`)).default,
+      admin: (await import(`../../locales/${locale}/admin.json`)).default,
     },
   };
 });

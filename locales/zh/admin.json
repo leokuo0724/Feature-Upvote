@@ -1,0 +1,112 @@
+{
+  "title": "管理面板",
+  "subtitle": "管理您的功能投票平台",
+  "features": {
+    "labelManagement": {
+      "title": "標籤管理",
+      "description": "創建和管理功能請求的標籤"
+    },
+    "settings": {
+      "title": "設定",
+      "description": "配置平台設定和偏好"
+    }
+  },
+  "status": {
+    "comingSoon": "即將推出",
+    "manageAndConfigure": "管理與配置"
+  },
+  "overview": {
+    "title": "平台概覽",
+    "stats": {
+      "activeUsers": "活躍用戶（30天）",
+      "totalFeatureRequests": "總功能請求數",
+      "totalComments": "總評論數"
+    },
+    "error": "錯誤",
+    "failedToLoad": "載入失敗"
+  },
+  "access": {
+    "denied": {
+      "title": "拒絕存取",
+      "message": "您沒有權限存取此頁面。"
+    },
+    "signInRequired": {
+      "title": "請登入",
+      "message": "您需要登入才能存取管理面板。"
+    },
+    "adminRequired": {
+      "title": "拒絕存取",
+      "message": "您需要管理員權限才能存取此頁面。"
+    }
+  },
+  "labels": {
+    "title": "標籤管理",
+    "subtitle": "管理功能請求的標籤",
+    "addLabel": "新增標籤",
+    "createNew": "創建新標籤",
+    "editLabel": "編輯標籤",
+    "labelName": "標籤名稱",
+    "labelNamePlaceholder": "輸入標籤名稱...",
+    "labelsCount": "標籤",
+    "noLabels": "未找到標籤",
+    "noLabelsDescription": "創建您的第一個標籤以開始使用",
+    "actions": {
+      "create": "創建",
+      "update": "更新",
+      "cancel": "取消",
+      "edit": "編輯",
+      "delete": "刪除"
+    },
+    "confirmDelete": "您確定要刪除標籤「{name}」嗎？",
+    "createdBy": "創建者",
+    "createdAt": "創建時間",
+    "usageCount": "在 {count} 個功能請求中使用"
+  },
+  "settings": {
+    "title": "應用程式設定",
+    "subtitle": "自訂您的功能投票平台",
+    "adminOnly": "僅限管理員",
+    "loading": "載入中...",
+    "tabs": {
+      "branding": "品牌設定",
+      "appearance": "外觀設定"
+    },
+    "branding": {
+      "title": "品牌設定",
+      "description": "自訂您平台的身份識別",
+      "projectName": {
+        "label": "專案名稱",
+        "placeholder": "輸入專案名稱",
+        "error": "專案名稱為必填項目"
+      },
+      "tagline": {
+        "label": "標語",
+        "placeholder": "輸入吸引人的標語",
+        "error": "標語為必填項目"
+      }
+    },
+    "appearance": {
+      "title": "外觀設定",
+      "description": "自訂外觀和感覺",
+      "primaryColor": {
+        "label": "主要顏色",
+        "description": "選擇您品牌的主要顏色",
+        "error": "無效的顏色格式"
+      },
+      "defaultTheme": {
+        "label": "預設主題",
+        "description": "為新用戶設定預設主題",
+        "options": {
+          "light": "淺色",
+          "dark": "深色",
+          "system": "系統"
+        }
+      }
+    },
+    "actions": {
+      "save": "儲存變更",
+      "saving": "儲存中...",
+      "saved": "設定已成功儲存！"
+    }
+  }
+}

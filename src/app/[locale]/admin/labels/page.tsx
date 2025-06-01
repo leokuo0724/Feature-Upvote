@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Plus, Edit, Trash2, Tag } from "lucide-react";
+import { useTranslations } from "next-intl";
 import {
   Card,
   CardContent,
@@ -32,6 +33,7 @@ interface LabelFormData {
 
 export default function AdminLabelsPage() {
   const { user } = useAuth();
+  const t = useTranslations("admin");
   const [isCreating, setIsCreating] = useState(false);
   const [editingLabel, setEditingLabel] = useState<Label | null>(null);
   const [formData, setFormData] = useState<LabelFormData>({ name: "" });
@@ -46,10 +48,10 @@ export default function AdminLabelsPage() {
     return (
       <div className="container mx-auto py-8">
         <div className="max-w-2xl mx-auto text-center">
-          <h1 className="text-2xl font-bold mb-4">Access Denied</h1>
-          <p className="text-muted-foreground">
-            You don't have permission to access this page.
-          </p>
+          <h1 className="text-2xl font-bold mb-4">
+            {t("access.denied.title")}
+          </h1>
+          <p className="text-muted-foreground">{t("access.denied.message")}</p>
         </div>
       </div>
     );
@@ -88,9 +90,7 @@ export default function AdminLabelsPage() {
   };
 
   const handleDelete = async (label: Label) => {
-    if (
-      !confirm(`Are you sure you want to delete the label "${label.name}"?`)
-    ) {
+    if (!confirm(t("labels.confirmDelete", { name: label.name }))) {
       return;
     }
 
@@ -126,10 +126,8 @@ export default function AdminLabelsPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold">Label Management</h1>
-            <p className="text-muted-foreground mt-2">
-              Manage labels for feature requests
-            </p>
+            <h1 className="text-3xl font-bold">{t("labels.title")}</h1>
+            <p className="text-muted-foreground mt-2">{t("labels.subtitle")}</p>
           </div>
           <Button
             className="w-full sm:w-fit"
@@ -137,7 +135,7 @@ export default function AdminLabelsPage() {
             disabled={isCreating}
           >
             <Plus className="h-4 w-4 mr-2" />
-            Add Label
+            {t("labels.addLabel")}
           </Button>
         </div>
 
@@ -146,7 +144,7 @@ export default function AdminLabelsPage() {
           <Card>
             <CardHeader>
               <CardTitle>
-                {editingLabel ? "Edit Label" : "Create New Label"}
+                {editingLabel ? t("labels.editLabel") : t("labels.createNew")}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -156,7 +154,7 @@ export default function AdminLabelsPage() {
                     htmlFor="name"
                     className="block text-sm font-medium mb-2"
                   >
-                    Label Name
+                    {t("labels.labelName")}
                   </label>
                   <Input
                     id="name"
@@ -165,7 +163,7 @@ export default function AdminLabelsPage() {
                     onChange={(e) =>
                       setFormData({ ...formData, name: e.target.value })
                     }
-                    placeholder="Enter label name..."
+                    placeholder={t("labels.labelNamePlaceholder")}
                     required
                   />
                 </div>
@@ -179,14 +177,16 @@ export default function AdminLabelsPage() {
                       updateLabel.isPending
                     }
                   >
-                    {editingLabel ? "Update" : "Create"}
+                    {editingLabel
+                      ? t("labels.actions.update")
+                      : t("labels.actions.create")}
                   </Button>
                   <Button
                     type="button"
                     variant="outline"
                     onClick={handleCancel}
                   >
-                    Cancel
+                    {t("labels.actions.cancel")}
                   </Button>
                 </div>
               </form>
@@ -197,12 +197,14 @@ export default function AdminLabelsPage() {
         {/* Labels List */}
         <Card>
           <CardHeader>
-            <CardTitle>Labels ({labels.length})</CardTitle>
+            <CardTitle>
+              {t("labels.labelsCount")} ({labels.length})
+            </CardTitle>
           </CardHeader>
           <CardContent>
             {labels.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
-                No labels created yet. Create your first label to get started.
+                {t("labels.noLabels")}. {t("labels.noLabelsDescription")}.
               </div>
             ) : (
               <div className="space-y-4">
@@ -216,8 +218,8 @@ export default function AdminLabelsPage() {
                         <Tag className="h-3 w-3 mr-1" />
                         {label.name}
                       </Badge>
-                      <div className="text-sm text-muted-foreground">
-                        Created{" "}
+                      <div className="hidden sm:visible text-sm text-muted-foreground">
+                        {t("labels.createdAt")}{" "}
                         {formatDistanceToNow(label.createdAt, {
                           addSuffix: true,
                         })}
@@ -250,7 +252,7 @@ export default function AdminLabelsPage() {
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => handleEdit(label)}>
                           <Edit className="mr-2 h-4 w-4" />
-                          Edit
+                          {t("labels.actions.edit")}
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
@@ -258,7 +260,7 @@ export default function AdminLabelsPage() {
                           className="text-destructive focus:text-destructive"
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
-                          Delete
+                          {t("labels.actions.delete")}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
